@@ -145,6 +145,7 @@ public class StrikerController : MonoBehaviour
         Vector3 direction = transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
         direction.z = 0f;
         float forceMagnitude = direction.magnitude * strikerSpeed;
+        Debug.Log("the force masgfnitue "+ forceMagnitude);
         forceMagnitude = Mathf.Clamp(forceMagnitude, 0f, maxForceMagnitude);
 
         // Apply the force to the striker
@@ -165,10 +166,6 @@ public class StrikerController : MonoBehaviour
         isMoving = false;
         isCharging = false;
 
-
-
-        Debug.Log("the last pocketed " + BoardManager.Instance.lastPocketedObject);
-        Debug.Log("here before check queen pocket");
         yield return StartCoroutine(BoardManager.Instance.CheckQueenPocket());
         gameObject.SetActive(false);
         //check here for sriker special condition 

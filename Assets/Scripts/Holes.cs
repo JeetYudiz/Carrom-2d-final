@@ -12,7 +12,7 @@ public class Holes : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+       
     }
 
     // Update is called once per frame
@@ -29,25 +29,32 @@ public class Holes : MonoBehaviour
         switch (other.gameObject.tag)
         {
             case "Striker":
+                Debug.Log("STRIKER");
                 bool realPlayerTurn = !GameManager.Instance.playerTurn;
                 BoardManager.Instance.LastPocketedString("Striker");
                 BoardManager.Instance.HandleStrikerCollision(realPlayerTurn);
                 other.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
                 break;
             case "Black":
+                Debug.Log("BLACK");
                 BoardManager.Instance.HandleBlackCoinCollision();
                 //here i have to call the coin animation
-               CoinMoveAnimation(BoardManager.Instance.AI.transform.position,other.gameObject);
+                other.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+                CoinMoveAnimation(BoardManager.Instance.AI.transform.position,other.gameObject);
                 //Destroy(other.gameObject);
                 break;
             case "White":
+                Debug.Log("WHITE");
                 BoardManager.Instance.HandleWhiteCoinCollision();
+                other.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
                 CoinMoveAnimation(BoardManager.Instance.Player.transform.position, other.gameObject);
                 //Destroy(other.gameObject);
                 break;
 
             case "Queen":
+                Debug.Log("QUEEN");
                 BoardManager.Instance.HandleQueenCollision();
+                other.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
                 Destroy(other.gameObject);
                 break;
         }

@@ -58,6 +58,7 @@ public class GameManager : MonoBehaviour
     public bool previousTurnState;
     public bool isbot;
     public bool orgplayerturn;
+    public string winner;
     void Awake()
     {
 
@@ -74,7 +75,7 @@ public class GameManager : MonoBehaviour
         }
 
 
-
+        Application.targetFrameRate = 150;
         timerScript = GetComponent<TimerScript>();
         isbot = false;
       
@@ -158,39 +159,132 @@ public class GameManager : MonoBehaviour
             CurrentTurnGameObject = enemyStriker;
         }
 
-        if (BoardManager.Instance.scoreEnemy >= 8 || BoardManager.Instance.scorePlayer >= 8 || CheckGameOverCondition())
+        //if (BoardManager.Instance.scoreEnemy >= 8 || BoardManager.Instance.scorePlayer >= 8 || CheckGameOverCondition())
+        //{
+        //    Debug.Log("inside boardmanager >=8");
+        //    onGameOver();
+        //}
+
+        //if (!gameOver)
+        //{
+        //    BoardManager.Instance.ResetlastPocketedObject();
+        //}
+        if (CheckGameOverCondition())
         {
-            Debug.Log("inside boardmanager >=8");
+            Debug.Log("Game Over");
             onGameOver();
         }
-
         if (!gameOver)
         {
             BoardManager.Instance.ResetlastPocketedObject();
         }
     }
-    /////////////////////////////////////////  
+    /// <summary>
+    /// /////////////
+    /// </summary>
+    /// <returns></returns>
     private bool CheckGameOverCondition()
     {
         int whiteCoinCount = GameObject.FindGameObjectsWithTag("White").Length;
         int blackCoinCount = GameObject.FindGameObjectsWithTag("Black").Length;
         bool isQueenOnBoard = GameObject.FindGameObjectWithTag("Queen") != null;
 
-        if (whiteCoinCount == 1 && blackCoinCount == 0 && isQueenOnBoard)
+        // Check if the queen is already pocketed
+        if (!isQueenOnBoard)
         {
-            Debug.Log("here in white count 1");
-            // Player must net the queen first
-            return true;
+            Debug.Log("not queen boards");
+            // If any player or opponent has a score of 9, they win
+            if (BoardManager.Instance.scoreEnemy == 2 || BoardManager.Instance.scorePlayer == 2)
+            {
+                winner = BoardManager.Instance.scoreEnemy == 2 ? "Opponent" : "Player";
+                return true;
+            }
         }
-        else if (whiteCoinCount == 0 && blackCoinCount == 1 && isQueenOnBoard)
+        else
         {
-            Debug.Log("here in black count 1");
-            // Opponent must net the queen first
-            return true;
+            Debug.Log("in queen boards");
+            // Queen is still on the board
+            if (GameManager.Instance.playerTurn)
+            {
+                // Player's turn
+                if (whiteCoinCount == 0 && blackCoinCount >= 1)
+                {
+                    // Player must pocket the queen first
+                    if (BoardManager.Instance.lastPocketedObject == "White")
+                    {
+                        Debug.Log("Player pocketed the white coin first. Opponent wins.");
+                        winner = "Opponent";
+                        return true;
+                    }
+                }
+                else if (whiteCoinCount == 0 && blackCoinCount >= 0)
+                {
+                    // Player must pocket the queen to win
+                    if (BoardManager.Instance.lastPocketedObject == "Queen")
+                    {
+                        winner = "Player";
+                        Debug.Log("Player pocketed the queen. Player wins.");
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                // Opponent's turn
+                if (blackCoinCount == 0 && whiteCoinCount >= 1)
+                {
+                    // Opponent must pocket the queen first
+                    if (BoardManager.Instance.lastPocketedObject == "Black")
+                    {
+                        Debug.Log("Opponent pocketed the black coin first. Player wins.");
+                        winner = "Player";
+                        return true;
+                    }
+                }
+                else if (blackCoinCount == 0 && whiteCoinCount >= 0)
+                {
+                    // Opponent must pocket the queen to win
+                    if (BoardManager.Instance.lastPocketedObject == "Queen")
+                    {
+                        winner = "Opponent";
+                        Debug.Log("Opponent pocketed the queen. Opponent wins.");
+                        return true;
+                    }
+                }
+            }
         }
 
         return false;
     }
+
+
+
+
+
+
+
+    /////////////////////////////////////////  
+    //private bool CheckGameOverCondition()
+    //{
+    //    int whiteCoinCount = GameObject.FindGameObjectsWithTag("White").Length;
+    //    int blackCoinCount = GameObject.FindGameObjectsWithTag("Black").Length;
+    //    bool isQueenOnBoard = GameObject.FindGameObjectWithTag("Queen") != null;
+
+    //    if (whiteCoinCount == 1 && blackCoinCount == 0 && isQueenOnBoard)
+    //    {
+    //        Debug.Log("here in white count 1");
+    //        // Player must net the queen first
+    //        return true;
+    //    }
+    //    else if (whiteCoinCount == 0 && blackCoinCount == 1 && isQueenOnBoard)
+    //    {
+    //        Debug.Log("here in black count 1");
+    //        // Opponent must net the queen first
+    //        return true;
+    //    }
+
+    //    return false;
+    //}
     private void LateUpdate()
     {
         if (!gameOver)
@@ -205,65 +299,72 @@ public class GameManager : MonoBehaviour
         animator.SetTrigger("fade");
         yield return new WaitForSeconds(1f);
     }
-
     void onGameOver()
     {
-        //here in ongameover 
         gameOver = true;
         gameOverMenu.SetActive(true);
         Time.timeScale = 0;
-        ////////////////////////////
-
-        //if (BoardManager.Instance.scoreEnemy > BoardManager.Instance.scorePlayer)
-        //{
-        //    gameOverText.text = "You Lose!";
-        //}
-        //else if (BoardManager.Instance.scoreEnemy < BoardManager.Instance.scorePlayer)
-        //{
-        //    gameOverText.text = "You Win!";
-        //}
-        //else
-        //{
-        //    gameOverText.text = "Draw!";
-        //}
-        ///////////////////////////to get the previops condition
 
         if (CheckGameOverCondition())
         {
-            Debug.Log("here in white pocketed");
-            if (BoardManager.Instance.lastPocketedObject == "White")
+            if (winner == "Player")
             {
-
-                // Player netted the white coin instead of the queen, opponent wins
-                Debug.Log("lose text display");
-                gameOverText.text = "You Lose!";
-            }
-            else if (BoardManager.Instance.lastPocketedObject == "Black")
-            {
-                // Opponent netted the black coin instead of the queen, player wins
-                Debug.Log("win text display");
+                Debug.Log("Player wins!");
                 gameOverText.text = "You Win!";
             }
-        }
-        else
-        {
-            Debug.Log("here in chgeck gameover conditiobn false");
-            if (BoardManager.Instance.scoreEnemy > BoardManager.Instance.scorePlayer)
+            else if (winner == "Opponent")
             {
+                Debug.Log("Opponent wins!");
                 gameOverText.text = "You Lose!";
             }
-            else if (BoardManager.Instance.scoreEnemy < BoardManager.Instance.scorePlayer)
-            {
-                gameOverText.text = "You Win!";
-            }
-            else
-            {
-                gameOverText.text = "Draw!";
-            }
         }
-
-        //////////////////////////
     }
+    //void onGameOver()
+    //{
+    //    //here in ongameover 
+    //    gameOver = true;
+    //    gameOverMenu.SetActive(true);
+    //    Time.timeScale = 0;
+    //    ////////////////////////////
+
+
+
+    //    if (CheckGameOverCondition())
+    //    {
+    //        Debug.Log("here in white pocketed");
+    //        if (BoardManager.Instance.lastPocketedObject == "White")
+    //        {
+
+    //            // Player netted the white coin instead of the queen, opponent wins
+    //            Debug.Log("lose text display");
+    //            gameOverText.text = "You Lose!";
+    //        }
+    //        else if (BoardManager.Instance.lastPocketedObject == "Black")
+    //        {
+    //            // Opponent netted the black coin instead of the queen, player wins
+    //            Debug.Log("win text display");
+    //            gameOverText.text = "You Win!";
+    //        }
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("here in chgeck gameover conditiobn false");
+    //        if (BoardManager.Instance.scoreEnemy > BoardManager.Instance.scorePlayer)
+    //        {
+    //            gameOverText.text = "You Lose!";
+    //        }
+    //        else if (BoardManager.Instance.scoreEnemy < BoardManager.Instance.scorePlayer)
+    //        {
+    //            gameOverText.text = "You Win!";
+    //        }
+    //        else
+    //        {
+    //            gameOverText.text = "Draw!";
+    //        }
+    //    }
+
+    //    //////////////////////////
+    //}
 
     public void ResumeGame()
     {

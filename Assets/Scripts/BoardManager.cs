@@ -121,6 +121,7 @@ public class BoardManager : MonoBehaviour
     }
     public void HandleStrikerCollision(bool realPlayerTurn)
     {
+        Debug.Log("real player turn"+ realPlayerTurn);
         if (realPlayerTurn)
         {
             if (scorePlayer > 0)
@@ -163,6 +164,7 @@ public class BoardManager : MonoBehaviour
     public void HandleWhiteCoinCollision()
     {
         scorePlayer++;
+        Debug.Log("here in white coin");
         if (lastPocketedObject == "Striker")
         {
             ChangeTurn();
