@@ -7,7 +7,7 @@ using System;
 
 public class GameManager : MonoBehaviour
 {
-    bool gameOver = false;
+    public bool gameOver = false;
     bool isPaused = false;
 
     // TextMeshProUGUI variables for displaying scores, game over text, and instructions.
@@ -77,20 +77,8 @@ public class GameManager : MonoBehaviour
 
         timerScript = GetComponent<TimerScript>();
         isbot = false;
-        // Check if it's the first time launching the game.
-        //if (PlayerPrefs.GetInt(FirstTimeLaunchKey, 0) == 0)
-        //{
-        //    timerScript.isTimerRunning = false;
-        //    Time.timeScale = 0;
-        //    instructionsMenu.SetActive(true);
-        //    PlayerPrefs.SetInt(FirstTimeLaunchKey, 1);
-        //}
-        //else
-        //{
-        //    timerScript.isTimerRunning = true;
-        //    instructionsMenu.SetActive(false);
-        //}
-        
+      
+
     }
     private void OnEnable()
     {
@@ -113,10 +101,6 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-
-       
-    
-
         if (Input.GetKeyDown(KeyCode.Escape) && !gameOver)
         {
             if (isPaused)
@@ -129,20 +113,26 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    
+    /////////////////////////////////////////  
     private void SwitchPosition()
     {
-        Debug.Log("here in switch positionsa");
-        //Debug.Log("here in switch positions "+GameManager.Instance.playerTurn);
+        StartCoroutine(SwitchPositionCoroutine());
+    }
+
+    private IEnumerator SwitchPositionCoroutine()
+    {
+        // Add a delay before switching positions
+        yield return new WaitForSeconds(2f); // Adjust the delay duration as needed
+
         if (playerTurn == true)
         {
-            
             Debug.Log("here in player turn");
             Debug.Log("true");
             isbot = false;
             slider.SetActive(true);
             turnText.SetActive(true);
             CurrentTurnGameObject = playerStriker;
+
             if (playerStriker.gameObject.activeInHierarchy == false)
             {
                 Debug.Log("active in hierechy false");
@@ -150,7 +140,6 @@ public class GameManager : MonoBehaviour
             }
             Debug.Log("after set active true");
             enemyStriker.gameObject.SetActive(false);
-
         }
         else
         {
@@ -160,23 +149,27 @@ public class GameManager : MonoBehaviour
             turnText.SetActive(false);
 
             playerStriker.gameObject.SetActive(false);
-         
+
             if (enemyStriker.gameObject.activeInHierarchy == false)
             {
-                  enemyStriker.gameObject.SetActive(true);
+                enemyStriker.gameObject.SetActive(true);
                 Debug.Log("after set active false");
             }
             CurrentTurnGameObject = enemyStriker;
         }
-        //if (BoardManager.Instance.scoreEnemy >= 8 || BoardManager.Instance.scorePlayer >= 8 || timerScript.timeLeft <= 0 || CheckGameOverCondition())
-          if (BoardManager.Instance.scoreEnemy >= 8 || BoardManager.Instance.scorePlayer >= 8 || CheckGameOverCondition())
+
+        if (BoardManager.Instance.scoreEnemy >= 8 || BoardManager.Instance.scorePlayer >= 8 || CheckGameOverCondition())
         {
+            Debug.Log("inside boardmanager >=8");
             onGameOver();
         }
 
-
+        if (!gameOver)
+        {
+            BoardManager.Instance.ResetlastPocketedObject();
+        }
     }
-
+    /////////////////////////////////////////  
     private bool CheckGameOverCondition()
     {
         int whiteCoinCount = GameObject.FindGameObjectsWithTag("White").Length;
@@ -185,11 +178,13 @@ public class GameManager : MonoBehaviour
 
         if (whiteCoinCount == 1 && blackCoinCount == 0 && isQueenOnBoard)
         {
+            Debug.Log("here in white count 1");
             // Player must net the queen first
             return true;
         }
         else if (whiteCoinCount == 0 && blackCoinCount == 1 && isQueenOnBoard)
         {
+            Debug.Log("here in black count 1");
             // Opponent must net the queen first
             return true;
         }
@@ -235,19 +230,24 @@ public class GameManager : MonoBehaviour
 
         if (CheckGameOverCondition())
         {
+            Debug.Log("here in white pocketed");
             if (BoardManager.Instance.lastPocketedObject == "White")
             {
+
                 // Player netted the white coin instead of the queen, opponent wins
+                Debug.Log("lose text display");
                 gameOverText.text = "You Lose!";
             }
             else if (BoardManager.Instance.lastPocketedObject == "Black")
             {
                 // Opponent netted the black coin instead of the queen, player wins
+                Debug.Log("win text display");
                 gameOverText.text = "You Win!";
             }
         }
         else
         {
+            Debug.Log("here in chgeck gameover conditiobn false");
             if (BoardManager.Instance.scoreEnemy > BoardManager.Instance.scorePlayer)
             {
                 gameOverText.text = "You Lose!";

@@ -1,0 +1,5 @@
+/Users/yudizsolutionsltd./Desktop/Github files/Carrom-2d-final/.utmp/RelWithDebInfo/23552w2m/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/yudizsolutionsltd./Desktop/Github files/Carrom-2d-final/.utmp/RelWithDebInfo/23552w2m/armeabi-v7a/CMakeFiles/rebuild_cache.dir
+/Users/yudizsolutionsltd./Desktop/Github files/Carrom-2d-final/.utmp/RelWithDebInfo/23552w2m/armeabi-v7a/FramePacing/CMakeFiles/swappywrapper.dir
+/Users/yudizsolutionsltd./Desktop/Github files/Carrom-2d-final/.utmp/RelWithDebInfo/23552w2m/armeabi-v7a/FramePacing/CMakeFiles/edit_cache.dir
+/Users/yudizsolutionsltd./Desktop/Github files/Carrom-2d-final/.utmp/RelWithDebInfo/23552w2m/armeabi-v7a/FramePacing/CMakeFiles/rebuild_cache.dir

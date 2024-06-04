@@ -1,9 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class Holes : MonoBehaviour
 {
+    public float moveDuration = 1f;
+    public Ease moveEase = Ease.Linear;
+    public float fadeDuration = 1f;
+    public Ease fadeEase = Ease.Linear;
     // Start is called before the first frame update
     void Start()
     {
@@ -31,11 +36,14 @@ public class Holes : MonoBehaviour
                 break;
             case "Black":
                 BoardManager.Instance.HandleBlackCoinCollision();
-                Destroy(other.gameObject);
+                //here i have to call the coin animation
+               CoinMoveAnimation(BoardManager.Instance.AI.transform.position,other.gameObject);
+                //Destroy(other.gameObject);
                 break;
             case "White":
                 BoardManager.Instance.HandleWhiteCoinCollision();
-                Destroy(other.gameObject);
+                CoinMoveAnimation(BoardManager.Instance.Player.transform.position, other.gameObject);
+                //Destroy(other.gameObject);
                 break;
 
             case "Queen":
@@ -43,5 +51,33 @@ public class Holes : MonoBehaviour
                 Destroy(other.gameObject);
                 break;
         }
+    }
+    public void CoinMoveAnimation(Vector3 targetPosition,GameObject coin)
+    {
+        Debug.Log("here in coin mover");
+        coin.transform.DOMove(targetPosition, moveDuration)
+         .SetEase(moveEase)
+         .OnComplete(() =>
+         {
+             // Fade the color of the GameObject's renderer
+             Renderer renderer = coin.GetComponent<Renderer>();
+             if (renderer != null)
+             {
+                 renderer.material.DOColor(Color.clear, fadeDuration)
+                     .SetEase(fadeEase)
+                     .OnComplete(() =>
+                     {
+                         // Destroy the GameObject after fading
+                         Destroy(coin.gameObject);
+                     });
+             }
+             else
+             {
+                 // If no renderer is found, destroy the GameObject immediately
+                 Destroy(coin.gameObject);
+             }
+         });
+
+
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -15,9 +16,16 @@ public class BoardManager : MonoBehaviour
     public GameObject queenPrefab;
     public  bool queenPocketed = false;
     public static BoardManager Instance { get; private set; }
-    
+    public float CoinSize;
+    public Vector3 targetPosition;
+   
+    public GameObject Player;
+    public GameObject AI;
+    public GameObject queenplayerui;
+    public GameObject queenaiui;
     private void Awake()
     {
+        CoinSize = blackCoinPrefab.GetComponent<SpriteRenderer>().bounds.size.x;
         //GameManager.OnTurnEnd += ResetlastPocketedObject;
         if (Instance == null)
         {
@@ -29,20 +37,13 @@ public class BoardManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+      
     }
-    private void OnEnable()
-    {
-        GameManager.OnTurnEnd += ResetlastPocketedObject;
-    }
-    private void OnDisable()
-    {
-        GameManager.OnTurnEnd -= ResetlastPocketedObject;
-    }
+  
+   
     private void Start()
     {
-        // Find the UpdatesText object and get the TextMeshProUGUI component
         popUpText = GameObject.Find("UpdatesText").GetComponent<TextMeshProUGUI>();
-        //previousTurnState = GameManager.Instance.playerTurn;
     }
 
     IEnumerator textPopUp(string text)
@@ -65,12 +66,8 @@ public class BoardManager : MonoBehaviour
     {
         lastPocketedObject = lastpocketed;
     }
-    private void ResetlastPocketedObject()
+    public void ResetlastPocketedObject()
     {
-
-        // Reset the last pocketed object only if the turn has changed
-        Debug.Log("the gamemanager player turn "+ GameManager.Instance.playerTurn);
-        Debug.Log("the gamemanager previous turn " + GameManager.Instance.previousTurnState);
         lastPocketedObject = null;
     }
 
@@ -128,6 +125,7 @@ public class BoardManager : MonoBehaviour
         {
             if (scorePlayer > 0)
             {
+                Debug.Log("here in white coin retiurn");
                 scorePlayer--;
                 StartCoroutine(ReturnCoin(whiteCoinPrefab));
             }
@@ -136,24 +134,24 @@ public class BoardManager : MonoBehaviour
         {
             if (scoreEnemy > 0)
             {
+                Debug.Log("here in black coin retiurn");
                 scoreEnemy--;
                 StartCoroutine(ReturnCoin(blackCoinPrefab));
             }
         }
-        //GameManager.Instance.playerTurn = realPlayerTurn;
         Debug.Log("here in player turn "+ GameManager.Instance.playerTurn);
         StartCoroutine(textPopUp("Striker Lost! -1 to " + (realPlayerTurn ? "Player" : "Enemy")));
     }
     public void HandleBlackCoinCollision()
     {
+        scoreEnemy++;
         if (lastPocketedObject == "Striker")
         {
             ChangeTurn();
             //ResetlastPocketedObject();
         }
         lastPocketedObject = "Black";
-        scoreEnemy++;
-
+   
         StartCoroutine(textPopUp("Black Coin Entered! +1 to Enemy"));
         Debug.Log("here in black");
 
@@ -164,13 +162,13 @@ public class BoardManager : MonoBehaviour
     }
     public void HandleWhiteCoinCollision()
     {
+        scorePlayer++;
         if (lastPocketedObject == "Striker")
         {
             ChangeTurn();
             //ResetlastPocketedObject();
         }
         lastPocketedObject = "White";
-        scorePlayer++;
         StartCoroutine(textPopUp("White Coin Entered! +1 to Player"));
         Debug.Log("here in white");
 
@@ -178,7 +176,6 @@ public class BoardManager : MonoBehaviour
         {
             GameManager.Instance.playerTurn = true;
         }
-        //here i have to 
     }
     public void HandleQueenCollision()
     {
@@ -190,18 +187,26 @@ public class BoardManager : MonoBehaviour
         {
             GameManager.Instance.playerTurn = true;
         }
-        Debug.Log("");
         queenPocketed = true;
         lastPocketedObject = "Queen";
-        StartCoroutine(textPopUp("Queen Entered! +2 to " + (GameManager.Instance.playerTurn ? "Player" : "Enemy")));
+        StartCoroutine(textPopUp("Queen Entered! Hit Cover " + (GameManager.Instance.playerTurn ? "Player" : "Enemy")));
         Debug.Log("player ");
     }
     public IEnumerator CheckQueenPocket()
     {
         if (queenPocketed && lastPocketedObject!="Queen")
         {
-            Debug.Log("here in queen pocketed");
-            if (GameManager.Instance.playerTurn && lastPocketedObject != "White")
+            if (GameManager.Instance.playerTurn && lastPocketedObject == "White")
+            {
+                // Player pocketed the white coin after the queen, activate queenPlayerUI
+                queenplayerui.SetActive(true);
+            }
+            else if (!GameManager.Instance.playerTurn && lastPocketedObject == "Black")
+            {
+                // Opponent pocketed the black coin after the queen, activate queenAIUI
+                queenaiui.SetActive(true);
+            }
+            else if (GameManager.Instance.playerTurn && lastPocketedObject != "White")
             {
                 // Player did not pocket the white coin after the queen, return the queen
                 yield return StartCoroutine(ReturnCoin(queenPrefab));
@@ -215,5 +220,6 @@ public class BoardManager : MonoBehaviour
             queenPocketed = false; // Reset the flag
         }
     }
+  
 
 }
