@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class StrikerController : MonoBehaviour
 {
@@ -131,21 +132,21 @@ public class StrikerController : MonoBehaviour
         {
             isObstructed = false;
             Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.1f);
+            List<Collider2D> filteredColliders = new List<Collider2D>();
+
             foreach (Collider2D collider in colliders)
             {
-                if (collider.CompareTag("Black") || collider.CompareTag("White") || collider.CompareTag("Striker"))
+                if (collider.gameObject != gameObject && (collider.CompareTag("Black") || collider.CompareTag("White") || collider.CompareTag("Striker")))
                 {
-                    
-                    isObstructed = true;
-                    break;
+                    filteredColliders.Add(collider);
                 }
             }
 
-            if (isObstructed)
+            if (filteredColliders.Count > 0)
             {
-                Debug.Log("here in isobstructed");
+                isObstructed = true;
                 // Generate a new random position within a specified range
-                float randomX = UnityEngine.Random.Range(-3.24f, 3.24f);
+                float randomX = Random.Range(-3.24f, 3.24f);
                 transform.position = new Vector3(randomX, -4.55f, 0f);
             }
 

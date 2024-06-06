@@ -19,6 +19,7 @@ public class RefStriker : MonoBehaviour
     public float strikeraroundlayerlength = 1f;
     Vector3 previousMousePosition;
     public Vector3 dragDirection;
+    [SerializeField] GameObject StrikerCrossHair;
     // Start is called before the first frame update
     void Start()
     {
@@ -38,7 +39,9 @@ public class RefStriker : MonoBehaviour
     }
     private void OnMouseDown()
     {
-        currentstriker.DisableCollider();
+        //turn on the outercircle
+        StrikerCrossHair.gameObject.SetActive(true);
+       currentstriker.DisableCollider();
     }
     private void OnMouseDrag()
     {
@@ -76,7 +79,8 @@ public class RefStriker : MonoBehaviour
     {
         //here disabl;e the spriute
         //setactive false
-       
+        //turn on the outercircle
+        StrikerCrossHair.gameObject.SetActive(false);
         StartCoroutine(HandleCollisions(Vector3.zero));
     }
 

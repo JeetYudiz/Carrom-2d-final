@@ -190,9 +190,9 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("not queen boards");
             // If any player or opponent has a score of 9, they win
-            if (BoardManager.Instance.scoreEnemy == 3 || BoardManager.Instance.scorePlayer == 3)
+            if (BoardManager.Instance.scoreEnemy == 9 || BoardManager.Instance.scorePlayer == 9)
             {
-                winner = BoardManager.Instance.scoreEnemy == 3 ? "Opponent" : "Player";
+                winner = BoardManager.Instance.scoreEnemy == 9 ? "Opponent" : "Player";
                 return true;
             }
         }

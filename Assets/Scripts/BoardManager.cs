@@ -199,7 +199,9 @@ public class BoardManager : MonoBehaviour
         Debug.Log("here in player turn " + GameManager.Instance.playerTurn);
         StartCoroutine(textPopUp("Striker Lost! -1 to " + (realPlayerTurn ? "Player" : "Enemy")));
         coin.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        coin.gameObject.GetComponent<CircleCollider2D>().enabled = true;
         coin.gameObject.GetComponent<SpriteRenderer>().enabled = false;
+
     }
     public void HandleBlackCoinCollision()
     {
