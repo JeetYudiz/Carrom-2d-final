@@ -22,7 +22,7 @@ public class EnemyStrikerController : MonoBehaviour
         // Check if the enemy striker has come to a near stop and is not moving
         if (rb.velocity.magnitude < 0.1f && !isMoving)
         {
-            Debug.Log("is moving");
+            Debug.Log("here in magnitude less than 0.1f");
             isMoving = true;
             StartCoroutine(EnemyTurn());
         }

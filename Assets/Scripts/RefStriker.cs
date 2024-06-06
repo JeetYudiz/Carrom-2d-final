@@ -48,7 +48,7 @@ public class RefStriker : MonoBehaviour
         currentstriker.transform.position = new Vector3(transform.position.x, currentstriker.transform.position.y,0f);
     }
 
-    private Vector3 GetStrikerPosition(Vector3 refstrikerpos)
+    public Vector3 GetStrikerPosition(Vector3 refstrikerpos)
     {
         refstrikerpos.x = Mathf.Clamp(refstrikerpos.x, xleftextreme, xrightextreme);
         refstrikerpos.y = orgpos.y;
@@ -74,12 +74,15 @@ public class RefStriker : MonoBehaviour
 
     private void OnMouseUp()
     {
+        //here disabl;e the spriute
+        //setactive false
+       
         StartCoroutine(HandleCollisions(Vector3.zero));
     }
 
-    private IEnumerator HandleCollisions(Vector3 moveDirection)
+    public IEnumerator HandleCollisions(Vector3 moveDirection)
     {
-        Debug.Log("the layer length "+ strikeraroundlayerlength);
+        Debug.Log("the layer length " + strikeraroundlayerlength);
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(currentstriker.transform.position, strikeraroundlayerlength);
         bool collided = false;
         Debug.Log("here in colliders " + hitColliders.Length);
@@ -124,7 +127,7 @@ public class RefStriker : MonoBehaviour
                         targetpos = targetpos2;
                     }
                 }
-              
+
                 RefStrikerMover(GetStrikerPosition(targetpos));
                 currentstriker.StrikerMover(GetStrikerPosition(targetpos));
                 collided = true;
@@ -153,13 +156,15 @@ public class RefStriker : MonoBehaviour
             // If a collision occurred, wait for a short delay and then continue handling collisions
             yield return new WaitForSeconds(0.1f);
             Debug.Log("collided");
-            
+
             StartCoroutine(HandleCollisions(moveDirection));
         }
         else
         {
             // If no collision occurred, immediately enable the collider
             Debug.Log("here in enable collider");
+            //turn on the redds
+
             currentstriker.EnableCollider();
         }
     }

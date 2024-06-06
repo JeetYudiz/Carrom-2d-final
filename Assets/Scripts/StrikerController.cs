@@ -15,10 +15,17 @@ public class StrikerController : MonoBehaviour
 
     [SerializeField]
     Transform strikerForceField;
+    [SerializeField]
+    Transform DottedLine;
+
 
     [SerializeField]
     Slider strikerSlider;
 
+
+    [SerializeField] SpriteRenderer circleSpriteRenderer;
+    [SerializeField] GameObject ArrowHandle;
+    [SerializeField] GameObject ArrowHead;
     bool isMoving;
     bool isCharging;
     float maxForceMagnitude = 30f;
@@ -26,7 +33,9 @@ public class StrikerController : MonoBehaviour
     //public float strikeraroundlayerlength ;
     Vector3 orgpos;
     public Image Slider;
-    public GameObject refStriker;
+    Vector3 circleSpriteOrgScale;
+    Vector3 arrowhandleScale;
+
     //public static bool playerTurn;
 
     private void Start()
@@ -35,71 +44,138 @@ public class StrikerController : MonoBehaviour
         isMoving = false;
         rb = GetComponent<Rigidbody2D>();
         orgpos =transform.position;
-     
+        circleSpriteOrgScale = circleSpriteRenderer.transform.localScale;
+        arrowhandleScale = ArrowHandle.transform.localScale;
 
     }
 
     private void OnEnable()
     {
-        //transform.position = new Vector3(strikerSlider.value, -4.57f, 0);
         strikerForceField.LookAt(transform.position);
-        strikerForceField.localScale = new Vector3(0, 0, 0);
         CollisionSoundManager.shouldBeStatic = true;
         GetComponent<SpriteRenderer>().enabled = false;
+       
+        //here setaqctive thje circle lines and line
+
         StartCoroutine(PlayerTurn());
     }
+    public void DisplayOutput()
+    {
 
+        Debug.Log("here in diuspalky output");
+    }
+
+    /// <summary>
+    /// //////////////////
+    /// </summary>
+    /// <returns></returns>
+    //public IEnumerator PlayerTurn()
+    //{
+    //    const int maxAttempts = 10;
+    //    int attempts = 0;
+    //    bool isObstructed;
+    //    float x = -0.25f;
+    //    transform.position = new Vector3(x, -4.55f, 0f);
+    //    do
+    //    {
+    //        isObstructed = false;
+
+    //        // Generate a random position within the board bounds
+
+
+    //        // Check if the generated position is obstructed by other coins or the striker
+    //        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.1f);
+
+    //        foreach (Collider2D collider in colliders)
+    //        {
+    //            if (collider.CompareTag("Black") || collider.CompareTag("White") || collider.CompareTag("Striker"))
+    //            {
+    //                isObstructed = true;
+    //                break;
+    //            }
+    //        }
+    //        Debug.Log("here");
+    //        attempts++;
+    //    }
+    //    while (isObstructed && attempts < maxAttempts);
+
+    //    if (isObstructed)
+    //    {
+    //        Debug.Log("Failed to find a valid position for the enemy striker.");
+    //        transform.position = new Vector3(-0.25f, -4.55f, 0f);
+    //        isObstructed = false;
+    //    }
+
+    //    yield return new WaitWhile(() => isObstructed);
+    //    Debug.Log("sprite renderer ");
+    //    //here i need tp set tje refstriker also
+    //    GameObject refStriker = GameObject.Find("RefStriker"); // Replace "RefStriker" with the actual name of the refStriker GameObject
+    //    if (refStriker != null)
+    //    {
+    //        Debug.Log("here in ref striker");
+    //        Vector3 refStrikerPosition = refStriker.transform.position;
+    //        refStrikerPosition.x = transform.position.x;
+    //        refStriker.transform.position = refStrikerPosition;
+    //    }
+    //    GetComponent<SpriteRenderer>().enabled = true;
+    //}
     public IEnumerator PlayerTurn()
     {
         const int maxAttempts = 10;
         int attempts = 0;
         bool isObstructed;
+        Vector3 initialPosition = new Vector3(-0.25f, -4.55f, 0f);
+        transform.position = initialPosition;
 
         do
         {
             isObstructed = false;
-
-            // Generate a random position within the board bounds
-            float x = -0.25f;
-            transform.position = new Vector3(x, -4.55f, 0f);
-
-            // Check if the generated position is obstructed by other coins or the striker
             Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.1f);
-
             foreach (Collider2D collider in colliders)
             {
                 if (collider.CompareTag("Black") || collider.CompareTag("White") || collider.CompareTag("Striker"))
                 {
+                    
                     isObstructed = true;
                     break;
                 }
             }
-            Debug.Log("here");
+
+            if (isObstructed)
+            {
+                Debug.Log("here in isobstructed");
+                // Generate a new random position within a specified range
+                float randomX = UnityEngine.Random.Range(-3.24f, 3.24f);
+                transform.position = new Vector3(randomX, -4.55f, 0f);
+            }
+
             attempts++;
         }
         while (isObstructed && attempts < maxAttempts);
 
         if (isObstructed)
         {
-            Debug.Log("Failed to find a valid position for the enemy striker.");
-            transform.position = new Vector3(-0.25f, -4.55f, 0f);
-            isObstructed = false;
+            Debug.Log("Failed to find a valid position for the player striker. Placing it at the initial position.");
+            transform.position = initialPosition;
         }
 
-        yield return new WaitWhile(() => isObstructed);
-        Debug.Log("sprite renderer ");
-        //here i need tp set tje refstriker also
-        GameObject refStriker = GameObject.Find("RefStriker"); // Replace "RefStriker" with the actual name of the refStriker GameObject
+        yield return null;
+
+        Debug.Log("Sprite renderer enabled");
+        GetComponent<SpriteRenderer>().enabled = true;
+
+        GameObject refStriker = GameObject.Find("RefStriker");
         if (refStriker != null)
         {
-            Debug.Log("here in ref striker");
+            Debug.Log("Updating RefStriker position");
             Vector3 refStrikerPosition = refStriker.transform.position;
             refStrikerPosition.x = transform.position.x;
             refStriker.transform.position = refStrikerPosition;
         }
-        GetComponent<SpriteRenderer>().enabled = true;
     }
-
+    /// <summary>
+    /// //////////////////////
+    /// </summary>
     private void Update()
     {
         //Debug.Log("striker " + transform.position);
@@ -116,20 +192,25 @@ public class StrikerController : MonoBehaviour
             return;
         }
 
-        // Reset the position of the striker if it is not at the correct y-axis position
-        //if (transform.position.y != -4.57f)
-        //{
-        //    transform.position = new Vector3(0, -4.57f, 0);
-        //}
-
-        // Enable charging and show the striker force field
+       
         isCharging = true;
         strikerForceField.gameObject.SetActive(true);
+        ArrowHandle.gameObject.SetActive(true);
+        circleSpriteRenderer.enabled = true;
+        circleSpriteRenderer.transform.localScale = new Vector3(5f, 5f, 5f);
+        DottedLine.gameObject.SetActive(true);
+        ArrowHead.gameObject.SetActive(true);
+
     }
 
     private void OnMouseUp()
     {
-        Debug.Log("heere in on mouse up");
+        GameManager.Instance.slider.SetActive(false);
+        ArrowHandle.gameObject.SetActive(false);
+        ArrowHead.gameObject.SetActive(false);
+        strikerForceField.gameObject.SetActive(false);
+        circleSpriteRenderer.enabled = false;
+        DottedLine.gameObject.SetActive(false);
         isMoving = true;
 
         // If charging is not enabled, return
@@ -138,19 +219,13 @@ public class StrikerController : MonoBehaviour
             return;
         }
 
-        strikerForceField.gameObject.SetActive(false);
         isCharging = false;
-        //GameManager.Instance.playerTurn = false;
-        // Calculate the direction and magnitude of the force based on the mouse position
+        
         Vector3 direction = transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
         direction.z = 0f;
         float forceMagnitude = direction.magnitude * strikerSpeed;
-        Debug.Log("the force masgfnitue "+ forceMagnitude);
         forceMagnitude = Mathf.Clamp(forceMagnitude, 0f, maxForceMagnitude);
-
-        // Apply the force to the striker
         rb.AddForce(direction.normalized * forceMagnitude, ForceMode2D.Impulse);
-
         CollisionSoundManager.shouldBeStatic = false;
         //1st strike problem
         GameManager.Instance.orgplayerturn = GameManager.Instance.playerTurn;
@@ -168,6 +243,7 @@ public class StrikerController : MonoBehaviour
 
         yield return StartCoroutine(BoardManager.Instance.CheckQueenPocket());
         gameObject.SetActive(false);
+
         //check here for sriker special condition 
         if (BoardManager.Instance.lastPocketedObject == "Striker")
         {
@@ -186,10 +262,10 @@ public class StrikerController : MonoBehaviour
             return;
         }
 
-        // Update the direction and scale of the striker force field based on the mouse position
         Vector3 direction = transform.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
         direction.z = 0f;
-        strikerForceField.LookAt(transform.position + direction);
+        strikerForceField.transform.up= direction.normalized;
+        DottedLine.transform.up = direction.normalized;
 
         float scaleValue = Vector3.Distance(transform.position, transform.position + direction / 4f);
 
@@ -199,6 +275,19 @@ public class StrikerController : MonoBehaviour
         }
 
         strikerForceField.localScale = new Vector3(scaleValue, scaleValue, scaleValue);
+
+     
+        //elongate along y axis
+        //Vector3 circleSpriteRendererScale = circleSpriteRenderer.transform.localScale;
+        if (circleSpriteRenderer.transform.localScale.x <= 20)
+        {
+            circleSpriteRenderer.transform.localScale = new Vector3(circleSpriteOrgScale.x + scaleValue * 15f, circleSpriteOrgScale.y + scaleValue * 15f, circleSpriteOrgScale.z + scaleValue * 15f);
+        }
+        if (arrowhandleScale.y <= 20)
+        {
+            ArrowHandle.transform.localScale = new Vector3(arrowhandleScale.x, arrowhandleScale.y + scaleValue * 24f, circleSpriteOrgScale.z ); ;
+        }
+
     }
 
     public void SetSliderX()
@@ -220,80 +309,7 @@ public class StrikerController : MonoBehaviour
             GetComponent<AudioSource>().Play();
         }
     }
-    /// <summary>
-    /// ////////////////////////////////////////////////
-    /// </summary>
-    /// <param name="moveDirection"></param>
-    /// <returns></returns>
-    //public IEnumerator HandleCollisions(Vector3 moveDirection)
-    //{
-    //    Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, strikeraroundlayerlength);
-    //    bool collided = false;
-       
-    //    foreach (var collider in hitColliders)
-    //    {
-    //        if (collider.gameObject != gameObject)
-    //        {
-    //            Debug.Log("here in hitcolliders");
-    //            Vector3 targetpos;
-    //            Vector3 targetpos1;
-    //            Vector3 targetpos2;
-    //            if (moveDirection == Vector3.zero)
-    //            {
-    //                if (transform.position.x > collider.transform.position.x)
-    //                {
-
-    //                    targetpos = collider.gameObject.transform.position + new Vector3(BoardManager.Instance.CoinSize * 1, 0, 0);
-    //                }
-    //                else
-    //                {
-
-    //                    targetpos = collider.gameObject.transform.position - new Vector3(BoardManager.Instance.CoinSize * 1, 0, 0);
-    //                }
-    //            }
-    //            else
-    //            {
-    //                targetpos1 = collider.gameObject.transform.position + new Vector3(BoardManager.Instance.CoinSize * 1, 0, 0);
-    //                Vector3 dir1 = (targetpos1 - refStriker.transform.position).normalized;
-    //                float angle1 = Vector3.Angle(moveDirection, dir1);
-
-    //                targetpos2 = collider.gameObject.transform.position - new Vector3(BoardManager.Instance.CoinSize * 1, 0, 0);
-    //                Vector3 dir2 = (targetpos2 - refStriker.transform.position).normalized;
-    //                float angle2 = Vector3.Angle(moveDirection, dir2);
-
-    //                if (angle1 < angle2)
-    //                {
-    //                    targetpos = targetpos1;
-    //                }
-    //                else
-    //                {
-    //                    targetpos = targetpos2;
-    //                }
-    //            }
-    //            Debug.Log("qfter target pos decided "+ targetpos);
-    //            RefStrikerMover(GetStrikerPosition(targetpos));
-    //            StrikerMover(GetStrikerPosition(targetpos));
-    //            collided = true;
-
-    //            // Update the moveDirection to the current direction
-    //            moveDirection = (targetpos - transform.position).normalized;
-
-
-    //        }
-    //    }
-    //    if (collided)
-    //    {
-    //        // If a collision occurred, wait for a short delay and then continue handling collisions
-    //        yield return new WaitForSeconds(0.1f);
-    //        StartCoroutine(HandleCollisions(moveDirection));
-    //    }
-    //    else
-    //    {
-    //        // If no collision occurred, immediately enable the collider
-    //        EnableCollider();
-    //    }
-
-    //}
+   
     public void DisableCollider()
     {
         GetComponent<CircleCollider2D>().enabled = false;
@@ -304,15 +320,15 @@ public class StrikerController : MonoBehaviour
     }
 
     ///////////////////////////////////////////////////
-    public void RefStrikerMover(Vector3 despos)
-    {
-    float moveDuration = 0.1f;
-     Vector3 newDesPos = new Vector3(despos.x,orgpos.y, despos.z);
-    //SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-    Sequence sequence = DOTween.Sequence();
-    sequence.Append(refStriker.transform.DOMove(despos, moveDuration));
-        sequence.Play();
-    }
+    //public void RefStrikerMover(Vector3 despos)
+    //{
+    //float moveDuration = 0.1f;
+    // Vector3 newDesPos = new Vector3(despos.x,orgpos.y, despos.z);
+    ////SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+    //Sequence sequence = DOTween.Sequence();
+    //sequence.Append(BoardManager.Instance.refStriker.transform.DOMove(despos, moveDuration));
+    //    sequence.Play();
+    //}
 
     /// <summary>
     /// /////////////
@@ -406,6 +422,87 @@ public class StrikerController : MonoBehaviour
     //    xrightextreme = maxX;
     //    Debug.Log("Minimum X in World Space: " + minX);
     //    Debug.Log("Maximum X in World Space: " + maxX);
+    //}
+    //public IEnumerator HandleCollisions(Vector3 moveDirection)
+    //{
+    //    Debug.Log("the layer length " + BoardManager.Instance.refStriker.strikeraroundlayerlength);
+    //    Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, BoardManager.Instance.refStriker.strikeraroundlayerlength);
+    //    bool collided = false;
+    //    Debug.Log("here in colliders " + hitColliders.Length);
+    //    foreach (var collider in hitColliders)
+    //    {
+    //        if (collider.gameObject != gameObject)
+    //        {
+    //            Vector3 targetpos;
+    //            Vector3 targetpos1;
+    //            Vector3 targetpos2;
+    //            if (moveDirection == Vector3.zero)
+    //            {
+    //                if (transform.position.x > collider.transform.position.x)
+    //                {
+    //                    targetpos = collider.gameObject.transform.position + new Vector3(BoardManager.Instance.CoinSize * 1.5f, 0, 0);
+    //                }
+    //                else
+    //                {
+    //                    targetpos = collider.gameObject.transform.position - new Vector3(BoardManager.Instance.CoinSize * 1.5f, 0, 0);
+    //                }
+    //            }
+    //            else
+    //            {
+    //                targetpos1 = collider.gameObject.transform.position + new Vector3(BoardManager.Instance.CoinSize * 1.5f, 0, 0);
+    //                Vector3 dir1 = (targetpos1 - transform.position).normalized;
+    //                float angle1 = Vector3.Angle(moveDirection, dir1);
+
+    //                targetpos2 = collider.gameObject.transform.position - new Vector3(BoardManager.Instance.CoinSize * 1.5f, 0, 0);
+    //                Vector3 dir2 = (targetpos2 - transform.position).normalized;
+    //                float angle2 = Vector3.Angle(moveDirection, dir2);
+
+    //                if (angle1 < angle2)
+    //                {
+    //                    targetpos = targetpos1;
+    //                }
+    //                else
+    //                {
+    //                    targetpos = targetpos2;
+    //                }
+    //            }
+
+    //            BoardManager.Instance.refStriker.RefStrikerMover(BoardManager.Instance.refStriker.GetStrikerPosition(targetpos));
+    //            StrikerMover(BoardManager.Instance.refStriker.GetStrikerPosition(targetpos));
+    //            collided = true;
+
+    //            // Update the moveDirection to the current direction
+    //            moveDirection = (targetpos - transform.position).normalized;
+    //            if (targetpos.x > BoardManager.Instance.refStriker.xrightextreme)
+    //            {
+    //                Debug.Log("here in greater than xrightextreme");
+    //                // Change moveDirection to the opposite side
+    //                moveDirection = new Vector3(-moveDirection.x, moveDirection.y, moveDirection.z);
+    //            }
+    //            else if (targetpos.x < BoardManager.Instance.refStriker.xleftextreme)
+    //            {
+    //                Debug.Log("here in less than xleftextreme");
+    //                // Change moveDirection to the opposite side
+    //                moveDirection = new Vector3(-moveDirection.x, moveDirection.y, moveDirection.z);
+    //            }
+    //        }
+    //    }
+
+    //    if (collided)
+    //    {
+    //        // If a collision occurred, wait for a short delay and then continue handling collisions
+    //        yield return new WaitForSeconds(0.1f);
+    //        Debug.Log("collided");
+
+    //        StartCoroutine(HandleCollisions(moveDirection));
+    //    }
+    //    else
+    //    {
+    //        // If no collision occurred, immediately enable the collider
+    //        Debug.Log("here in enable collider");
+    //        EnableCollider();
+    //        GetComponent<SpriteRenderer>().enabled=true;
+    //    }
     //}
 
 }

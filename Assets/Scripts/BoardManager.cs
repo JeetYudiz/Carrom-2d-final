@@ -23,9 +23,17 @@ public class BoardManager : MonoBehaviour
     public GameObject AI;
     public GameObject queenplayerui;
     public GameObject queenaiui;
+
+    [SerializeField]
+    TextMeshProUGUI scoreTextEnemy;
+
+    [SerializeField]
+    TextMeshProUGUI scoreTextPlayer;
+    //public RefStriker refStriker;
     private void Awake()
     {
         CoinSize = blackCoinPrefab.GetComponent<SpriteRenderer>().bounds.size.x;
+
         //GameManager.OnTurnEnd += ResetlastPocketedObject;
         if (Instance == null)
         {
@@ -105,47 +113,98 @@ public class BoardManager : MonoBehaviour
                 attempts++;
             }
         }
+        ///////////////////////////////////////////////////////////
+       
 
-        // If no valid position found, instantiate the coin at the return position as a fallback
+        // Determine the starting position based on the turn
+        Vector3 startPosition = !GameManager.Instance.playerTurn ? BoardManager.Instance.Player.transform.position : BoardManager.Instance.AI.transform.position;
+        Vector3 randomPosition=Vector3.zero;
         if (coin == null)
         {
-            Vector3 randomPosition = returnPosition + new Vector3(Random.insideUnitCircle.x, Random.insideUnitCircle.y, 0f) * 2f;
-            coin = Instantiate(coinPrefab, randomPosition, Quaternion.identity);
+            randomPosition = returnPosition + new Vector3(Random.insideUnitCircle.x, Random.insideUnitCircle.y, 0f) * 2f;
+            coin = Instantiate(coinPrefab, startPosition, Quaternion.identity);
+        }
+        // Move the coin from the starting position to the random position
+        coin.transform.position = startPosition;
+        coin.GetComponent<Collider2D>().enabled = false;
+
+
+        SpriteRenderer coinRenderer = coin.GetComponent<SpriteRenderer>();
+
+        // Set the alpha of the coin to 0
+        if (coinRenderer != null)
+        {
+            Color coinColor = coinRenderer.color;
+            coinColor.a = 0.3f;
+            coinRenderer.color = coinColor;
         }
 
-        // Wait for a short duration before enabling the collider of the returned coin
-        Debug.Log("here in return position " + returnPosition);
-        coin.GetComponent<Collider2D>().enabled = false;
-        yield return new WaitForSeconds(0.5f);
+        // Move the coin to the random position using DOTween
+        coin.transform.DOMove(randomPosition, 0.25f)
+      .SetEase(Ease.InOutQuad)
+      .OnComplete(() =>
+      {
+        // Enable the coin's collider
         coin.GetComponent<Collider2D>().enabled = true;
+
+        // Change the alpha of the coin back to 1
+        if (coinRenderer != null)
+          {
+              Color coinColor = coinRenderer.color;
+              coinColor.a = 1f;
+              coinRenderer.color = coinColor;
+          }
+      });
+        yield return new WaitForSeconds(1f);
+
+        // If no valid position found, instantiate the coin at the return position as a fallback
+        //if (coin == null)
+        //{
+        //    Vector3 randomPosition = returnPosition + new Vector3(Random.insideUnitCircle.x, Random.insideUnitCircle.y, 0f) * 2f;
+        //    coin = Instantiate(coinPrefab, randomPosition, Quaternion.identity);
+        //    //here the cpin shpudl gop from p[layer to randpm, position and tge same as ebnemt
+        //}
+
+        //// Wait for a short duration before enabling the collider of the returned coin
+        //Debug.Log("here in return position " + returnPosition);
+        //coin.GetComponent<Collider2D>().enabled = false;
+        //yield return new WaitForSeconds(0.5f);
+        //coin.GetComponent<Collider2D>().enabled = true;
     }
-    public void HandleStrikerCollision(bool realPlayerTurn)
+  
+    public void HandleStrikerCollision(bool realPlayerTurn,Collider2D coin)
     {
-        Debug.Log("real player turn"+ realPlayerTurn);
+        Debug.Log("real player turn" + realPlayerTurn);
+        Debug.Log("score enemy " + scoreEnemy);
         if (realPlayerTurn)
         {
+            Debug.Log("here in realplayer turn true");
             if (scorePlayer > 0)
             {
                 Debug.Log("here in white coin retiurn");
-                scorePlayer--;
+                ScorePlayerAddition(--scorePlayer);
                 StartCoroutine(ReturnCoin(whiteCoinPrefab));
             }
         }
         else
         {
+            Debug.Log("here in realplayer turn false");
             if (scoreEnemy > 0)
             {
                 Debug.Log("here in black coin retiurn");
-                scoreEnemy--;
+                ScoreEnemyAddition(--scoreEnemy);
                 StartCoroutine(ReturnCoin(blackCoinPrefab));
             }
         }
-        Debug.Log("here in player turn "+ GameManager.Instance.playerTurn);
+        Debug.Log("here in player turn " + GameManager.Instance.playerTurn);
         StartCoroutine(textPopUp("Striker Lost! -1 to " + (realPlayerTurn ? "Player" : "Enemy")));
+        coin.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        coin.gameObject.GetComponent<SpriteRenderer>().enabled = false;
     }
     public void HandleBlackCoinCollision()
     {
-        scoreEnemy++;
+        ScoreEnemyAddition(++scoreEnemy);
+        Debug.Log("here in white coin");
         if (lastPocketedObject == "Striker")
         {
             ChangeTurn();
@@ -163,8 +222,7 @@ public class BoardManager : MonoBehaviour
     }
     public void HandleWhiteCoinCollision()
     {
-        scorePlayer++;
-        Debug.Log("here in white coin");
+        ScorePlayerAddition(++scorePlayer);
         if (lastPocketedObject == "Striker")
         {
             ChangeTurn();
@@ -222,6 +280,23 @@ public class BoardManager : MonoBehaviour
             queenPocketed = false; // Reset the flag
         }
     }
-  
+
+    public void ScorePlayerAddition(float scoreplayer)
+    {
+        if (!GameManager.Instance.gameOver)
+        {
+            Debug.Log("the scpre player"+scorePlayer);
+            scoreTextPlayer.text = scoreplayer.ToString();
+        }
+    }
+    public void ScoreEnemyAddition(float scoreenemy)
+    {
+        if (!GameManager.Instance.gameOver)
+        {
+            Debug.Log("the scpre enemy" + scoreenemy);
+            scoreTextEnemy.text = scoreenemy.ToString();
+        }
+    }
+
 
 }

@@ -11,11 +11,7 @@ public class GameManager : MonoBehaviour
     bool isPaused = false;
 
     // TextMeshProUGUI variables for displaying scores, game over text, and instructions.
-    [SerializeField]
-    TextMeshProUGUI scoreTextEnemy;
-
-    [SerializeField]
-    TextMeshProUGUI scoreTextPlayer;
+  
 
     [SerializeField]
     TextMeshProUGUI gameOverText;
@@ -42,8 +38,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     GameObject turnText;
 
-    [SerializeField]
-    GameObject slider;
+    
+    public GameObject slider;
 
     [SerializeField]
     Animator animator;
@@ -146,7 +142,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("here in opponents turn");
             isbot = true;
-            slider.SetActive(false);
+         
             turnText.SetActive(false);
 
             playerStriker.gameObject.SetActive(false);
@@ -194,9 +190,9 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("not queen boards");
             // If any player or opponent has a score of 9, they win
-            if (BoardManager.Instance.scoreEnemy == 2 || BoardManager.Instance.scorePlayer == 2)
+            if (BoardManager.Instance.scoreEnemy == 3 || BoardManager.Instance.scorePlayer == 3)
             {
-                winner = BoardManager.Instance.scoreEnemy == 2 ? "Opponent" : "Player";
+                winner = BoardManager.Instance.scoreEnemy == 3 ? "Opponent" : "Player";
                 return true;
             }
         }
@@ -285,15 +281,15 @@ public class GameManager : MonoBehaviour
 
     //    return false;
     //}
-    private void LateUpdate()
-    {
-        if (!gameOver)
-        {
-            scoreTextEnemy.text = BoardManager.Instance.scoreEnemy.ToString();
-            scoreTextPlayer.text = BoardManager.Instance.scorePlayer.ToString();
-        }
-    }
-
+    //private void LateUpdate()
+    //{
+    //    if (!gameOver)
+    //    {
+    //        scoreTextEnemy.text = BoardManager.Instance.scoreEnemy.ToString();
+    //        scoreTextPlayer.text = BoardManager.Instance.scorePlayer.ToString();
+    //    }
+    //}
+    
     IEnumerator playAnimation()
     {
         animator.SetTrigger("fade");
