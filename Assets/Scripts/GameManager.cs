@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 using System;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -175,15 +176,17 @@ public class GameManager : MonoBehaviour
             BoardManager.Instance.ResetlastPocketedObject();
         }
     }
+
     /// <summary>
     /// /////////////
     /// </summary>
     /// <returns></returns>
+    [Obsolete]
     private bool CheckGameOverCondition()
     {
-        int whiteCoinCount = GameObject.FindGameObjectsWithTag("White").Length;
-        int blackCoinCount = GameObject.FindGameObjectsWithTag("Black").Length;
-        bool isQueenOnBoard = GameObject.FindGameObjectWithTag("Queen") != null;
+        int whiteCoinCount = FindObjectsOfType<TagManager>().Count(t => t.tagType == Tags.White);
+        int blackCoinCount = FindObjectsOfType<TagManager>().Count(t => t.tagType == Tags.Black);
+        bool isQueenOnBoard = FindObjectsOfType<TagManager>().Any(t => t.tagType == Tags.Queen);
 
         // Check if the queen is already pocketed
         if (!isQueenOnBoard)

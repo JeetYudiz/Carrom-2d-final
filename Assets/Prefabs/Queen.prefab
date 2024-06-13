@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3325202331268495271}
   - component: {fileID: 3827030105488862951}
   - component: {fileID: 1696740398020030319}
+  - component: {fileID: 1291303371614325743}
   m_Layer: 0
   m_Name: Queen
   m_TagString: Queen
@@ -28,13 +29,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2742582990828879480}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.21214437, y: -0.8113153, z: 0}
-  m_LocalScale: {x: 0.11999999, y: 0.11999999, z: 0.11999999}
+  m_LocalScale: {x: 0.12, y: 0.12, z: 0.12}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &612374807643220269
 SpriteRenderer:
@@ -259,3 +260,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d3fd0e0e07344c4eb71ac877e2935f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1291303371614325743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2742582990828879480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 365016abccd5b4bd0a7e4a97eb33ded0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tagType: 5
