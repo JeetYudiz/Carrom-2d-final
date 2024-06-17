@@ -65,7 +65,7 @@ public class StrikerController : MonoBehaviour
     private IEnumerator PositionStrikerWithoutCollision()
     {
         bool isObstructed;
-        Vector3 initialPosition = new Vector3(-0.25f, -4.55f, 0f);
+        Vector3 initialPosition = new Vector3(0f, -4f, 0f);
         transform.position = initialPosition;
 
         do
@@ -122,8 +122,8 @@ public class StrikerController : MonoBehaviour
                 if (isObstructed)
                 {
                     // If still obstructed, generate a new random position
-                    float randomX = Random.Range(-3.24f, 3.24f);
-                    transform.position = new Vector3(randomX, -4.55f, 0f);
+                    float randomX = Random.Range(-2.84f, 2.84f);
+                    transform.position = new Vector3(randomX, -4f, 0f);
                 }
             }
 

@@ -147,7 +147,7 @@ public class Holes : MonoBehaviour
         Vector3 initialVelocity = coinRigidbody.velocity;
 
         // Calculate the target position based on the initial velocity direction
-        Vector3 targetPos = coin.transform.position + initialVelocity.normalized * 0.15f;
+        Vector3 targetPos = coin.transform.position + initialVelocity.normalized * 0.12f;
         Debug.Log("target pos " + initialVelocity.normalized * 10f);
 
         // Calculate the duration based on the coin's initial velocity magnitude
@@ -163,7 +163,7 @@ public class Holes : MonoBehaviour
             .OnComplete(() =>
             {
                 // After moving, scale down the coin to 0.1f
-                coin.transform.DOScale(0.1f, 0.2f)
+                coin.transform.DOScale(0.09f, 0.1f)
                     .SetEase(Ease.InOutSine)
                     .OnComplete(() =>
                     {

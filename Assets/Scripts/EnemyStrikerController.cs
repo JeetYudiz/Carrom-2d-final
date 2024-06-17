@@ -36,7 +36,7 @@ public class EnemyStrikerController : MonoBehaviour
         // Reset the initial state of the enemy striker
         CollisionSoundManager.shouldBeStatic = true;
         GetComponent<SpriteRenderer>().enabled = true;
-        transform.position = new Vector3(0, 3.45f, 0f);
+        transform.position = new Vector3(0, 2.85f, 0f);
     }
 
 
@@ -158,8 +158,8 @@ public class EnemyStrikerController : MonoBehaviour
         {
             isObstructed = false;
             // Generate a random position within the board bounds
-            float x = Random.Range(-3.24f, 3.24f);
-            transform.position = new Vector3(x, 3.45f, 0f);
+            float x = Random.Range(-2.84f, 2.84f);
+            transform.position = new Vector3(x, 2.85f, 0f);
 
             // Check if the generated position is obstructed by other coins or the striker
             Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.1f);
@@ -179,7 +179,7 @@ public class EnemyStrikerController : MonoBehaviour
         if (isObstructed)
         {
             Debug.Log("Failed to find a valid position for the enemy striker.");
-            transform.position = new Vector3(0f, 3.45f, 0f);
+            transform.position = new Vector3(0f, 2.85f, 0f);
             isObstructed = false;
         }
 
@@ -222,12 +222,16 @@ public class EnemyStrikerController : MonoBehaviour
         {
             Vector3 targetDirection = bestCoin.transform.position - transform.position;
             targetDirection.z = 0f;
-
+            Vector3 targetpos = bestCoin.transform.position;
             // Check if it's a backshot
-            bool isBackshot = Vector3.Dot(targetDirection.normalized, transform.up) < 0f;
-
+            //bool isBackshot = Vector3.Dot(targetDirection.normalized, transform.up) > 0f;
+            //instead of this check target if the target y is gretaer than striker than is bc
+            //Debug.Log("the target direction y "+ targetDirection.y);
+            //Debug.Log("the tranform position y " + transform.position.y);
+            bool isBackshot = (targetpos.y - transform.position.y)>0;
             float targetSpeed = CalculateStrikerSpeed(targetDirection.magnitude, isBackshot);
             Debug.Log("target speed "+targetSpeed);
+            Debug.Log("the best coin is "+bestCoin.transform.name);
             rb.AddForce(targetDirection.normalized * targetSpeed, ForceMode2D.Impulse);
         }
 
@@ -235,6 +239,7 @@ public class EnemyStrikerController : MonoBehaviour
         {
             // No valid coin found, take a defensive shot or skip turn
             // Implement your defensive shot logic here
+            DefensiveShot();
             Debug.Log("No valid coin found. Taking a defensive shot or skipping turn.");
         }
 
@@ -300,6 +305,19 @@ public class EnemyStrikerController : MonoBehaviour
     }
 
 
+    private void DefensiveShot()
+    {
+        // Implement defensive shot logic here
+        // For example, you can aim for a position that blocks the opponent's easy shots
+        // or try to scatter the coins to make it harder for the opponent to pocket them
+
+        // Example defensive shot: Hit the striker towards the center of the board
+        Vector3 targetPosition = Vector3.zero;
+        Vector3 targetDirection = targetPosition - transform.position;
+        targetDirection.z = 0f;
+        float targetSpeed = CalculateStrikerSpeed(targetDirection.magnitude, false);
+        rb.AddForce(targetDirection.normalized * targetSpeed, ForceMode2D.Impulse);
+    }
 
 
 
@@ -353,7 +371,7 @@ public class EnemyStrikerController : MonoBehaviour
                 }
             }
         }
-
+        Debug.Log("the min angle dirfferece "+minAngleDifference);
         return bestCoin;
     }
 
@@ -511,10 +529,12 @@ public class EnemyStrikerController : MonoBehaviour
 
     float CalculateStrikerSpeed(float distance, bool isBackshot)
     {
+        Debug.Log("<color=red>is back shot</color>"+ isBackshot);
         float maxDistance = 4.0f; // Maximum distance the striker can travel
-        float minSpeed = 10f; // Minimum striker speed
-        float maxSpeed = isBackshot ? 25f : 27f; // Maximum striker speed based on backshot
-
+        float minSpeed = isBackshot ? 5f : 15f; // Minimum striker speed
+        float maxSpeed = isBackshot ? 13f : 25f; // Maximum striker speed based on backshot
+        Debug.Log("<color=red>min speed </color>"+ minSpeed);
+        Debug.Log("<color=red>max speed </color>" + maxSpeed);
         float speed = Mathf.Lerp(minSpeed, maxSpeed, distance / maxDistance);
         return speed;
     }
