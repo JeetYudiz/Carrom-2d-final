@@ -73,7 +73,7 @@ public class StrikerController : MonoBehaviour
             isObstructed = false;
             Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.2f);
             List<Collider2D> filteredColliders = new List<Collider2D>();
-
+            List<Collider2D> reColliders = new List<Collider2D>();
             foreach (Collider2D collider in colliders)
             {
                 if (collider.gameObject != gameObject)
@@ -95,24 +95,33 @@ public class StrikerController : MonoBehaviour
                     if (transform.position.x > collider.transform.position.x)
                     {
                         Debug.Log("1");
-                        targetpos = collider.transform.position + new Vector3(BoardManager.Instance.CoinSize * 0.01f, 0, 0);
+                        targetpos = collider.transform.position + new Vector3(BoardManager.Instance.CoinSize * 0.00001f, 0, 0);
                     }
                     else
                     {
                         Debug.Log("2");
-                        targetpos = collider.transform.position - new Vector3(BoardManager.Instance.CoinSize * 0.01f, 0, 0);
+                        targetpos = collider.transform.position - new Vector3(BoardManager.Instance.CoinSize * 0.00001f, 0, 0);
                     }
 
                     moveDirection = (targetpos - transform.position).normalized;
 
                     // Move the striker away from the colliding object
-                    Vector3 newPosition = transform.position + moveDirection * 0.01f;
+                    Vector3 newPosition = transform.position + moveDirection * 0.00001f;
                     transform.position = newPosition;
 
                     // Check for collisions at the new position
                     Collider2D[] newColliders = Physics2D.OverlapCircleAll(newPosition, 0.2f);
-                    if (newColliders.Length == 1 && newColliders[0].gameObject == gameObject)
+                    //foreach (Collider2D recollider in newColliders)
+                    //{
+                    //    if (collider.gameObject != gameObject)
+                    //    {
+                    //        reColliders.Add(collider);
+                    //    }
+                    //}
+                    Debug.Log("befire 1");
+                    if (reColliders.Count == 1 && newColliders[0].gameObject == gameObject)
                     {
+                        Debug.Log("here in count 1");
                         // No collisions at the new position, exit the loop
                         isObstructed = false;
                         break;

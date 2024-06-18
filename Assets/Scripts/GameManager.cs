@@ -56,6 +56,8 @@ public class GameManager : MonoBehaviour
     public bool isbot;
     public bool orgplayerturn;
     public string winner;
+    //public TextMeshProUGUI TurnTimer;
+    public TurnTimerScript turntimer;
     void Awake()
     {
 
@@ -75,7 +77,7 @@ public class GameManager : MonoBehaviour
         Application.targetFrameRate = 150;
         timerScript = GetComponent<TimerScript>();
         isbot = false;
-      
+        //turntimer.TimerStart();
 
     }
     private void OnEnable()
@@ -124,8 +126,8 @@ public class GameManager : MonoBehaviour
 
         if (playerTurn == true)
         {
-            Debug.Log("here in player turn");
-            Debug.Log("true");
+
+            //turntimer.gameObject.SetActive(false);
             isbot = false;
             slider.SetActive(true);
             turnText.SetActive(true);
@@ -135,6 +137,7 @@ public class GameManager : MonoBehaviour
             {
                 Debug.Log("active in hierechy false");
                 playerStriker.gameObject.SetActive(true);
+
             }
             Debug.Log("after set active true");
             enemyStriker.gameObject.SetActive(false);

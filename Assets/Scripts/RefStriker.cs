@@ -104,21 +104,21 @@ public class RefStriker : MonoBehaviour
                     if (currentstriker.transform.position.x > collider.transform.position.x)
                     {
 
-                        targetpos = collider.gameObject.transform.position + new Vector3(BoardManager.Instance.CoinSize * 1.5f, 0, 0);
+                        targetpos = collider.gameObject.transform.position + new Vector3(BoardManager.Instance.CoinSize * 1.2f, 0, 0);
                     }
                     else
                     {
 
-                        targetpos = collider.gameObject.transform.position - new Vector3(BoardManager.Instance.CoinSize * 1.5f, 0, 0);
+                        targetpos = collider.gameObject.transform.position - new Vector3(BoardManager.Instance.CoinSize * 1.2f, 0, 0);
                     }
                 }
                 else
                 {
-                    targetpos1 = collider.gameObject.transform.position + new Vector3(BoardManager.Instance.CoinSize * 1.5f, 0, 0);
+                    targetpos1 = collider.gameObject.transform.position + new Vector3(BoardManager.Instance.CoinSize * 1.2f, 0, 0);
                     Vector3 dir1 = (targetpos1 - transform.position).normalized;
                     float angle1 = Vector3.Angle(moveDirection, dir1);
 
-                    targetpos2 = collider.gameObject.transform.position - new Vector3(BoardManager.Instance.CoinSize * 1.5f, 0, 0);
+                    targetpos2 = collider.gameObject.transform.position - new Vector3(BoardManager.Instance.CoinSize * 1.2f, 0, 0);
                     Vector3 dir2 = (targetpos2 - transform.position).normalized;
                     float angle2 = Vector3.Angle(moveDirection, dir2);
 

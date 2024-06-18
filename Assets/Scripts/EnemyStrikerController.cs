@@ -239,7 +239,7 @@ public class EnemyStrikerController : MonoBehaviour
         {
             // No valid coin found, take a defensive shot or skip turn
             // Implement your defensive shot logic here
-            DefensiveShot();
+            //DefensiveShot();
             Debug.Log("No valid coin found. Taking a defensive shot or skipping turn.");
         }
 
