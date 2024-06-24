@@ -36,7 +36,7 @@ public class StrikerController : MonoBehaviour
     public Image Slider;
     Vector3 circleSpriteOrgScale;
     Vector3 arrowhandleScale;
-
+    public bool isObstructed = false;
     //public static bool playerTurn;
 
     private void Start()
@@ -64,16 +64,19 @@ public class StrikerController : MonoBehaviour
     }
     private IEnumerator PositionStrikerWithoutCollision()
     {
-        bool isObstructed;
+        //bool isObstructed;
         Vector3 initialPosition = new Vector3(0f, -4f, 0f);
-        transform.position = initialPosition;
-
+        //check if obstruced
+        if (!isObstructed)
+        {
+            transform.position = initialPosition;
+        }
         do
         {
             isObstructed = false;
             Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.2f);
             List<Collider2D> filteredColliders = new List<Collider2D>();
-            List<Collider2D> reColliders = new List<Collider2D>();
+            //List<Collider2D> reColliders = new List<Collider2D>();
             foreach (Collider2D collider in colliders)
             {
                 if (collider.gameObject != gameObject)
@@ -95,20 +98,33 @@ public class StrikerController : MonoBehaviour
                     if (transform.position.x > collider.transform.position.x)
                     {
                         Debug.Log("1");
-                        targetpos = collider.transform.position + new Vector3(BoardManager.Instance.CoinSize * 0.00001f, 0, 0);
+                        //collider transform position causomng a problem
+                        Vector3 AddedVector = new Vector3(collider.transform.position.x * 0.01f, collider.transform.position.y, collider.transform.position.z);
+                        targetpos = AddedVector;
                     }
                     else
                     {
                         Debug.Log("2");
-                        targetpos = collider.transform.position - new Vector3(BoardManager.Instance.CoinSize * 0.00001f, 0, 0);
+                        Vector3 AddedVector = new Vector3(collider.transform.position.x * 0.01f, collider.transform.position.y, collider.transform.position.z);
+                        targetpos = AddedVector;
                     }
 
                     moveDirection = (targetpos - transform.position).normalized;
-
+                    //targetpos = collider.transform.position
                     // Move the striker away from the colliding object
-                    Vector3 newPosition = transform.position + moveDirection * 0.00001f;
+                    //Debug.Log("the move direction " + moveDirection);
+                    //Debug.Log("the new move direction " + moveDirection*0.001f);
+                    //Debug.Log("the present position "+transform.position);
+                    //Debug.Log("the current transform position  " + transform.position);
+                    Vector3 newPosition = transform.position + moveDirection * 0.01f;
+                    Debug.Log("the present pos " + newPosition);
+                    //                   Debug.Log("the new position " + newPosition);
+                    //                   Debug.Log("the current collider position "+ collider.transform.position);
+                    //                   Debug.Log("tghe coin size "+ new Vector3(BoardManager.Instance.CoinSize * 0.00001f, 0, 0)
+                    //);
+                    Debug.Log("the current striker pos " + transform.position);
                     transform.position = newPosition;
-
+                    Debug.Log("t");
                     // Check for collisions at the new position
                     Collider2D[] newColliders = Physics2D.OverlapCircleAll(newPosition, 0.2f);
                     //foreach (Collider2D recollider in newColliders)
@@ -119,7 +135,8 @@ public class StrikerController : MonoBehaviour
                     //    }
                     //}
                     Debug.Log("befire 1");
-                    if (reColliders.Count == 1 && newColliders[0].gameObject == gameObject)
+                    //if (reColliders.Count == 1 && newColliders[0].gameObject == gameObject)
+                    if (newColliders[0].gameObject == gameObject)
                     {
                         Debug.Log("here in count 1");
                         // No collisions at the new position, exit the loop
@@ -132,6 +149,7 @@ public class StrikerController : MonoBehaviour
                 {
                     // If still obstructed, generate a new random position
                     float randomX = Random.Range(-2.84f, 2.84f);
+                    //the below loop running again and agaoomn
                     transform.position = new Vector3(randomX, -4f, 0f);
                 }
             }
@@ -152,60 +170,6 @@ public class StrikerController : MonoBehaviour
             refStriker.transform.position = refStrikerPosition;
         }
     }
-    //public IEnumerator PlayerTurn()
-    //{
-    //    const int maxAttempts = 10;
-    //    int attempts = 0;
-    //    bool isObstructed;
-    //    Vector3 initialPosition = new Vector3(-0.25f, -4.55f, 0f);
-    //    transform.position = initialPosition;
-
-    //    do
-    //    {
-    //        isObstructed = false;
-    //        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.1f);
-    //        List<Collider2D> filteredColliders = new List<Collider2D>();
-
-    //        foreach (Collider2D collider in colliders)
-    //        {
-    //            if (collider.gameObject != gameObject && (collider.CompareTag("Black") || collider.CompareTag("White") || collider.CompareTag("Striker")))
-    //            {
-    //                filteredColliders.Add(collider);
-    //            }
-    //        }
-
-    //        if (filteredColliders.Count > 0)
-    //        {
-    //            isObstructed = true;
-    //            // Generate a new random position within a specified range
-    //            float randomX = Random.Range(-3.24f, 3.24f);
-    //            transform.position = new Vector3(randomX, -4.55f, 0f);
-    //        }
-
-    //        attempts++;
-    //    }
-    //    while (isObstructed && attempts < maxAttempts);
-
-    //    if (isObstructed)
-    //    {
-    //        Debug.Log("Failed to find a valid position for the player striker. Placing it at the initial position.");
-    //        transform.position = initialPosition;
-    //    }
-
-    //    yield return null;
-
-    //    Debug.Log("Sprite renderer enabled");
-    //    GetComponent<SpriteRenderer>().enabled = true;
-
-    //    GameObject refStriker = GameObject.Find("RefStriker");
-    //    if (refStriker != null)
-    //    {
-    //        Debug.Log("Updating RefStriker position");
-    //        Vector3 refStrikerPosition = refStriker.transform.position;
-    //        refStrikerPosition.x = transform.position.x;
-    //        refStriker.transform.position = refStrikerPosition;
-    //    }
-    //}
 
     private void Update()
     {
@@ -225,26 +189,44 @@ public class StrikerController : MonoBehaviour
 
        
         isCharging = true;
+    
+        EnableStrikerComponents();
+        //Enabke striker eleebnt
+  
+    }
+
+    public void EnableStrikerComponents()
+    {
         strikerForceField.gameObject.SetActive(true);
         ArrowHandle.gameObject.SetActive(true);
         circleSpriteRenderer.enabled = true;
         circleSpriteRenderer.transform.localScale = new Vector3(5f, 5f, 5f);
         DottedLine.gameObject.SetActive(true);
         ArrowHead.gameObject.SetActive(true);
-
+    }
+    public void OnDisable()
+    {
+        ArrowHandle.gameObject.SetActive(false);
+        Debug.Log("after ArrowHandle setactive false");
+        ArrowHead.gameObject.SetActive(false);
+        Debug.Log("after ArrowHead setactive false");
+        strikerForceField.gameObject.SetActive(false);
+        Debug.Log("after strikerForceField setactive false");
+        circleSpriteRenderer.enabled = false;
+        Debug.Log("after circleSpriteRenderer setactive false");
+        DottedLine.gameObject.SetActive(false);
     }
 
     private void OnMouseUp()
     {
-        GameManager.Instance.slider.SetActive(false);
-        ArrowHandle.gameObject.SetActive(false);
-        ArrowHead.gameObject.SetActive(false);
-        strikerForceField.gameObject.SetActive(false);
-        circleSpriteRenderer.enabled = false;
-        DottedLine.gameObject.SetActive(false);
         isMoving = true;
 
+        //disabke striker eleebnt
         // If charging is not enabled, return
+        GameManager.Instance.turntimer.gameObject.SetActive(false);
+        //GameManager.Instance.
+        DisableStrikerComponents();
+        //here disable timer
         if (!isCharging)
         {
             return;
@@ -272,6 +254,22 @@ public class StrikerController : MonoBehaviour
         GameManager.Instance.playerTurn = false;
         // Wait until the striker comes to a near stop
         StartCoroutine(WaitForStrikerStop());
+    }
+
+    public void DisableStrikerComponents()
+    {
+        GameManager.Instance.slider.SetActive(false);
+        Debug.Log("after slider setactive false");
+        ArrowHandle.gameObject.SetActive(false);
+        Debug.Log("after ArrowHandle setactive false");
+        ArrowHead.gameObject.SetActive(false);
+        Debug.Log("after ArrowHead setactive false");
+        strikerForceField.gameObject.SetActive(false);
+        Debug.Log("after strikerForceField setactive false");
+        circleSpriteRenderer.enabled = false;
+        Debug.Log("after circleSpriteRenderer setactive false");
+        DottedLine.gameObject.SetActive(false);
+        Debug.Log("after DottedLine setactive false");
     }
 
     private IEnumerator WaitForStrikerStop()

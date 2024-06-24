@@ -55,8 +55,6 @@ public class RefStriker : MonoBehaviour
     {
         refstrikerpos.x = Mathf.Clamp(refstrikerpos.x, xleftextreme, xrightextreme);
         refstrikerpos.y = orgpos.y;
-        //transform.position = refstrikerpos;
-        //currentstriker.transform.position = new Vector3(refstrikerpos.x, currentstrikerorgpos.y, 0f);
         Vector3 strikerpos = new Vector3(refstrikerpos.x, orgpos.y, 0f);
         return strikerpos;
     }
@@ -77,9 +75,7 @@ public class RefStriker : MonoBehaviour
 
     private void OnMouseUp()
     {
-        //here disabl;e the spriute
-        //setactive false
-        //turn on the outercircle
+     
         StrikerCrossHair.gameObject.SetActive(false);
         StartCoroutine(HandleCollisions(Vector3.zero));
     }
@@ -131,7 +127,7 @@ public class RefStriker : MonoBehaviour
                         targetpos = targetpos2;
                     }
                 }
-
+                Debug.Log("before RefStrikerMover");
                 RefStrikerMover(GetStrikerPosition(targetpos));
                 currentstriker.StrikerMover(GetStrikerPosition(targetpos));
                 collided = true;

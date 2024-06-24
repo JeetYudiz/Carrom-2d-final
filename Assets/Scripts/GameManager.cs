@@ -30,8 +30,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     GameObject gameOverMenu;
 
-    [SerializeField]
-    GameObject playerStriker;
+    
+    public StrikerController playerStriker;
 
     [SerializeField]
     GameObject enemyStriker;
@@ -58,6 +58,8 @@ public class GameManager : MonoBehaviour
     public string winner;
     //public TextMeshProUGUI TurnTimer;
     public TurnTimerScript turntimer;
+    public bool hasTurnEnded = false;
+    public bool TurnEnd;
     void Awake()
     {
 
@@ -77,7 +79,7 @@ public class GameManager : MonoBehaviour
         Application.targetFrameRate = 150;
         timerScript = GetComponent<TimerScript>();
         isbot = false;
-        //turntimer.TimerStart();
+        turntimer.TimerStart();
 
     }
     private void OnEnable()
@@ -123,34 +125,46 @@ public class GameManager : MonoBehaviour
     {
         // Add a delay before switching positions
         yield return new WaitForSeconds(2f); // Adjust the delay duration as needed
-
+        //yield return null;
         if (playerTurn == true)
         {
-
             //turntimer.gameObject.SetActive(false);
+            //can we increase
+
+            //here we need to start the timer
+
+            //call onturn start
+            Debug.Log("here in plaayer turn");
+            GameManager.Instance.turntimer.gameObject.SetActive(true);
+            turntimer.TimerStart();
             isbot = false;
             slider.SetActive(true);
             turnText.SetActive(true);
-            CurrentTurnGameObject = playerStriker;
+            CurrentTurnGameObject = playerStriker.gameObject;
 
             if (playerStriker.gameObject.activeInHierarchy == false)
             {
                 Debug.Log("active in hierechy false");
                 playerStriker.gameObject.SetActive(true);
-
             }
             Debug.Log("after set active true");
             enemyStriker.gameObject.SetActive(false);
         }
         else
         {
+
+            //here we need to start the timer
+            //turntimer.TimerStart();
+            GameManager.Instance.turntimer.gameObject.SetActive(false);
             Debug.Log("here in opponents turn");
             isbot = true;
          
             turnText.SetActive(false);
-
-            playerStriker.gameObject.SetActive(false);
-
+            Debug.Log("after turn text false");
+            if (enemyStriker.gameObject.activeInHierarchy == true)
+            {
+                playerStriker.gameObject.SetActive(false);
+            }
             if (enemyStriker.gameObject.activeInHierarchy == false)
             {
                 enemyStriker.gameObject.SetActive(true);

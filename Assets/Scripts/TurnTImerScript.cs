@@ -25,7 +25,6 @@ public class TurnTimerScript : MonoBehaviour
 
     IEnumerator UpdateTimer()
     {
-        Debug.Log("here in update timer");
         while (time > 0f )
         {
             yield return null; // Wait for the next frame
@@ -38,7 +37,18 @@ public class TurnTimerScript : MonoBehaviour
             {
                 time = 0f;
                 UpdateTimeText();
-                GameManager.Instance.EndTurn();
+                //keep a boolen
+                if (!GameManager.Instance.hasTurnEnded) // Check the flag before ending the turn
+                {
+                    GameManager.Instance.hasTurnEnded = true; // Set the flag to true
+                    GameManager.Instance.playerTurn = !GameManager.Instance.playerTurn;
+                    //GameManager.Instance.DisableStrikerComponents()
+                    //game manager slider set active false
+                    GameManager.Instance.playerStriker.gameObject.SetActive(false);
+                    GameManager.Instance.slider.SetActive(false);
+                    GameManager.Instance.EndTurn(); 
+                }
+                //GameManager.Instance.EndTurn();
             }
         }
 
@@ -48,7 +58,16 @@ public class TurnTimerScript : MonoBehaviour
     {
         int seconds = Mathf.FloorToInt(time);
         int milliseconds = Mathf.FloorToInt((time % 1f) * 100f);
-
         text.text = string.Format("{0:00}:{1:00}", seconds, milliseconds);
+    }
+    public void RestartTimer()
+    {
+        StopCoroutine(UpdateTimer()); // Stop the coroutine if it's running
+        TimerStart(); // Restart the timer
+    }
+    private void OnDisable()
+    {
+        Debug.Log("here in on disable");
+        GameManager.Instance.hasTurnEnded = false;
     }
 }
