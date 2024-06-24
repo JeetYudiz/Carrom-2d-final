@@ -84,9 +84,7 @@ public class Holes : MonoBehaviour
         // Play audio when a coin/striker enters the pocket
         GetComponent<AudioSource>().Play();
         other.gameObject.GetComponent<Collider2D>().enabled = false;
-        //gameObject.GetComponent<Collider2D>().enabled = false;
-
-        // Get the TagManager component from the collided GameObject
+      
         TagManager tagManager = other.gameObject.GetComponent<TagManager>();
 
         if (tagManager != null)
@@ -111,13 +109,14 @@ public class Holes : MonoBehaviour
                     break;
                 case Tags.Black:
                     Debug.Log("BLACK");
-
+                    Debug.Log("the current turn "+GameManager.Instance.playerTurn);
                     BoardManager.Instance.HandleBlackCoinCollision();
                     CoinMoveAnimation(BoardManager.Instance.AI.transform.position, other.gameObject);
                     break;
                 case Tags.White:
                     Debug.Log("WHITE");
                     //other.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+                    Debug.Log("the current turn " + GameManager.Instance.playerTurn);
                     BoardManager.Instance.HandleWhiteCoinCollision();
                     CoinMoveAnimation(BoardManager.Instance.Player.transform.position, other.gameObject);
                     break;
@@ -145,7 +144,6 @@ public class Holes : MonoBehaviour
 
         // Get the initial velocity of the coin when it enters the trigger
         Vector3 initialVelocity = coinRigidbody.velocity;
-
         // Calculate the target position based on the initial velocity direction
         Vector3 targetPos = coin.transform.position + initialVelocity.normalized * 0.12f;
         Debug.Log("target pos " + initialVelocity.normalized * 10f);

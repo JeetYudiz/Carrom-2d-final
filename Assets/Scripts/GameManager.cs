@@ -186,6 +186,8 @@ public class GameManager : MonoBehaviour
         if (CheckGameOverCondition())
         {
             Debug.Log("Game Over");
+            //onGameOver
+            //ticktimer setactive false
             onGameOver();
         }
         if (!gameOver)
@@ -218,6 +220,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+
             Debug.Log("in queen boards");
             // Queen is still on the board
             if (GameManager.Instance.playerTurn)

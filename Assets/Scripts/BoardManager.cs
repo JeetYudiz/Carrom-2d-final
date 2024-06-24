@@ -29,6 +29,12 @@ public class BoardManager : MonoBehaviour
 
     [SerializeField]
     TextMeshProUGUI scoreTextPlayer;
+    public enum PlayerColor { None, White, Black }
+    public PlayerColor playerTargetColor = PlayerColor.None;
+    public PlayerColor enemyTargetColor = PlayerColor.None;
+    public bool isFoul = false;
+    public bool colorsAssigned = false;  // New variable
+
     //public RefStriker refStriker;
     private void Awake()
     {

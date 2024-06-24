@@ -37,7 +37,7 @@ public class StrikerController : MonoBehaviour
     Vector3 circleSpriteOrgScale;
     Vector3 arrowhandleScale;
     public bool isObstructed = false;
-    public float strikeraroundlayerlength = 0f;
+    public float strikeraroundlayerlength ;
     public float xleftextreme;
     public float xrightextreme;
     //public static bool playerTurn;
@@ -63,7 +63,7 @@ public class StrikerController : MonoBehaviour
         GetComponent<SpriteRenderer>().enabled = false;
         GetComponent<CircleCollider2D>().enabled = false;
         //here setaqctive thje circle lines and line
-
+         
         //StartCoroutine(PlayerTurn());
         StartCoroutine(PositionStrikerWithoutCollision());
 
