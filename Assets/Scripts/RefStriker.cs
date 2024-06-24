@@ -16,7 +16,7 @@ public class RefStriker : MonoBehaviour
     //private Vector3 currentstrikerorgpos;
     private int layerMask;
     int strikerLayer;
-    public float strikeraroundlayerlength = 1f;
+    public float strikeraroundlayerlength = 0.8f;
     Vector3 previousMousePosition;
     public Vector3 dragDirection;
     [SerializeField] GameObject StrikerCrossHair;
@@ -101,6 +101,7 @@ public class RefStriker : MonoBehaviour
                     {
 
                         targetpos = collider.gameObject.transform.position + new Vector3(BoardManager.Instance.CoinSize * 1.2f, 0, 0);
+
                     }
                     else
                     {

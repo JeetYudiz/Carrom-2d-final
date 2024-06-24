@@ -37,6 +37,9 @@ public class StrikerController : MonoBehaviour
     Vector3 circleSpriteOrgScale;
     Vector3 arrowhandleScale;
     public bool isObstructed = false;
+    public float strikeraroundlayerlength = 0f;
+    public float xleftextreme;
+    public float xrightextreme;
     //public static bool playerTurn;
 
     private void Start()
@@ -48,13 +51,16 @@ public class StrikerController : MonoBehaviour
         circleSpriteOrgScale = circleSpriteRenderer.transform.localScale;
         arrowhandleScale = ArrowHandle.transform.localScale;
         maxForceMagnitude = 40f;
+        xleftextreme = -2.84f; // Adjust this value based on your game's dimensions
+        xrightextreme = 2.84f;
+        strikeraroundlayerlength = 0.3f;
     }
 
     private void OnEnable()
     {
         strikerForceField.LookAt(transform.position);
         CollisionSoundManager.shouldBeStatic = true;
-        GetComponent<SpriteRenderer>().enabled = true;
+        GetComponent<SpriteRenderer>().enabled = false;
         GetComponent<CircleCollider2D>().enabled = false;
         //here setaqctive thje circle lines and line
 
@@ -62,114 +68,235 @@ public class StrikerController : MonoBehaviour
         StartCoroutine(PositionStrikerWithoutCollision());
 
     }
+
+    /// <summary>
+    /// /////////////////
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator PositionStrikerWithoutCollision()
     {
-        //bool isObstructed;
         Vector3 initialPosition = new Vector3(0f, -4f, 0f);
-        //check if obstruced
-        if (!isObstructed)
-        {
-            transform.position = initialPosition;
-        }
-        do
-        {
-            isObstructed = false;
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.2f);
-            List<Collider2D> filteredColliders = new List<Collider2D>();
-            //List<Collider2D> reColliders = new List<Collider2D>();
-            foreach (Collider2D collider in colliders)
-            {
-                if (collider.gameObject != gameObject)
-                {
-                    filteredColliders.Add(collider);
-                }
-            }
+        transform.position = initialPosition;
 
-            Debug.Log("Filtered count: " + filteredColliders.Count);
+        yield return StartCoroutine(HandleCollisions(Vector3.zero));
 
-            if (filteredColliders.Count > 0)
-            {
-                isObstructed = true;
-                Vector3 moveDirection = Vector3.zero;
-
-                foreach (Collider2D collider in filteredColliders)
-                {
-                    Vector3 targetpos;
-                    if (transform.position.x > collider.transform.position.x)
-                    {
-                        Debug.Log("1");
-                        //collider transform position causomng a problem
-                        Vector3 AddedVector = new Vector3(collider.transform.position.x * 0.01f, collider.transform.position.y, collider.transform.position.z);
-                        targetpos = AddedVector;
-                    }
-                    else
-                    {
-                        Debug.Log("2");
-                        Vector3 AddedVector = new Vector3(collider.transform.position.x * 0.01f, collider.transform.position.y, collider.transform.position.z);
-                        targetpos = AddedVector;
-                    }
-
-                    moveDirection = (targetpos - transform.position).normalized;
-                    //targetpos = collider.transform.position
-                    // Move the striker away from the colliding object
-                    //Debug.Log("the move direction " + moveDirection);
-                    //Debug.Log("the new move direction " + moveDirection*0.001f);
-                    //Debug.Log("the present position "+transform.position);
-                    //Debug.Log("the current transform position  " + transform.position);
-                    Vector3 newPosition = transform.position + moveDirection * 0.01f;
-                    Debug.Log("the present pos " + newPosition);
-                    //                   Debug.Log("the new position " + newPosition);
-                    //                   Debug.Log("the current collider position "+ collider.transform.position);
-                    //                   Debug.Log("tghe coin size "+ new Vector3(BoardManager.Instance.CoinSize * 0.00001f, 0, 0)
-                    //);
-                    Debug.Log("the current striker pos " + transform.position);
-                    transform.position = newPosition;
-                    Debug.Log("t");
-                    // Check for collisions at the new position
-                    Collider2D[] newColliders = Physics2D.OverlapCircleAll(newPosition, 0.2f);
-                    //foreach (Collider2D recollider in newColliders)
-                    //{
-                    //    if (collider.gameObject != gameObject)
-                    //    {
-                    //        reColliders.Add(collider);
-                    //    }
-                    //}
-                    Debug.Log("befire 1");
-                    //if (reColliders.Count == 1 && newColliders[0].gameObject == gameObject)
-                    if (newColliders[0].gameObject == gameObject)
-                    {
-                        Debug.Log("here in count 1");
-                        // No collisions at the new position, exit the loop
-                        isObstructed = false;
-                        break;
-                    }
-                }
-
-                if (isObstructed)
-                {
-                    // If still obstructed, generate a new random position
-                    float randomX = Random.Range(-2.84f, 2.84f);
-                    //the below loop running again and agaoomn
-                    transform.position = new Vector3(randomX, -4f, 0f);
-                }
-            }
-
-            yield return null;
-        }
-        while (isObstructed);
-
-        Debug.Log("Sprite renderer enabled");
+        // Enable sprite renderer and collider
+        Debug.Log("here adter handling collision");
         GetComponent<SpriteRenderer>().enabled = true;
         GetComponent<CircleCollider2D>().enabled = true;
+
+        // Update RefStriker position
+        
         GameObject refStriker = GameObject.Find("RefStriker");
         if (refStriker != null)
         {
-            Debug.Log("Updating RefStriker position");
+            Debug.Log("set the ref striker pos "+refStriker);
             Vector3 refStrikerPosition = refStriker.transform.position;
             refStrikerPosition.x = transform.position.x;
             refStriker.transform.position = refStrikerPosition;
         }
+        if(refStriker==null)
+        {
+            Debug.Log("<color=blue>The ref striker null </color>" + refStriker);
+        }
+
     }
+
+    private IEnumerator HandleCollisions(Vector3 moveDirection)
+    {
+
+
+        bool collided = false;
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, strikeraroundlayerlength);
+        Debug.Log("the movr dior "+ moveDirection);
+        Debug.Log("striker aroind lauyer " + strikeraroundlayerlength);
+        Debug.Log(" here in collider "+ hitColliders[0].gameObject.name);
+        foreach (var collider in hitColliders)
+        {
+            if (collider.gameObject != gameObject)
+            {
+                Vector3 targetpos;
+                if (moveDirection == Vector3.zero)
+                {
+                    if (transform.position.x > collider.transform.position.x)
+                    {
+                        targetpos = collider.transform.position + new Vector3(BoardManager.Instance.CoinSize * 1.4f, 0, 0);
+                    }
+                    else
+                    {
+                        targetpos = collider.transform.position - new Vector3(BoardManager.Instance.CoinSize * 1.4f, 0, 0);
+                    }
+                }
+                else
+                {
+                    Vector3 targetpos1 = collider.transform.position + new Vector3(BoardManager.Instance.CoinSize * 1.4f, 0, 0);
+                    Vector3 targetpos2 = collider.transform.position - new Vector3(BoardManager.Instance.CoinSize * 1.4f, 0, 0);
+
+                    Vector3 dir1 = (targetpos1 - transform.position).normalized;
+                    Vector3 dir2 = (targetpos2 - transform.position).normalized;
+
+                    float angle1 = Vector3.Angle(moveDirection, dir1);
+                    float angle2 = Vector3.Angle(moveDirection, dir2);
+
+                    targetpos = (angle1 < angle2) ? targetpos1 : targetpos2;
+                    Debug.Log("the target pos "+targetpos);
+                }
+
+                targetpos = GetStrikerPosition(targetpos);
+                //RefStrikerMover(targetpos);
+                StrikerMover(targetpos);
+                collided = true;
+
+                moveDirection = (targetpos - transform.position).normalized;
+                if (targetpos.x > xrightextreme || targetpos.x < xleftextreme)
+                {
+                    moveDirection = new Vector3(-moveDirection.x, moveDirection.y, moveDirection.z);
+                }
+                Debug.Log("the direction "+moveDirection);
+                break;
+            }
+        }
+
+        if (collided)
+        {
+            yield return new WaitForSeconds(0.1f);
+            Debug.Log("Collided, handling collisions again");
+            hitColliders = null;
+            Debug.Log("the move dir "+moveDirection);
+            yield return StartCoroutine(HandleCollisions(moveDirection));
+        }
+        else
+        {
+            Debug.Log("No collision, enabling collider");
+            //EnableCollider();
+        }
+    }
+
+    private Vector3 GetStrikerPosition(Vector3 position)
+    {
+        position.x = Mathf.Clamp(position.x, xleftextreme, xrightextreme);
+        position.y = orgpos.y;
+        return new Vector3(position.x, position.y, 0f);
+    }
+
+    //public void StrikerMover(Vector3 despos)
+    //{
+    //    float moveDuration = 0.1f;
+    //    despos = new Vector3(despos.x, orgpos.y, 0f);
+    //    transform.DOMove(despos, moveDuration);
+    //}
+    /// <summary>
+    /// ///////////
+    /// </summary>
+
+    //private IEnumerator PositionStrikerWithoutCollision()
+    //{
+    //    //bool isObstructed;
+    //    Vector3 initialPosition = new Vector3(0f, -4f, 0f);
+    //    //check if obstruced
+    //    if (!isObstructed)
+    //    {
+    //        transform.position = initialPosition;
+    //    }
+    //    do
+    //    {
+    //        isObstructed = false;
+    //        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 0.2f);
+    //        List<Collider2D> filteredColliders = new List<Collider2D>();
+    //        //List<Collider2D> reColliders = new List<Collider2D>();
+    //        foreach (Collider2D collider in colliders)
+    //        {
+    //            if (collider.gameObject != gameObject)
+    //            {
+    //                filteredColliders.Add(collider);
+    //            }
+    //        }
+
+    //        Debug.Log("Filtered count: " + filteredColliders.Count);
+
+    //        if (filteredColliders.Count > 0)
+    //        {
+    //            isObstructed = true;
+    //            Vector3 moveDirection = Vector3.zero;
+
+    //            foreach (Collider2D collider in filteredColliders)
+    //            {
+    //                Vector3 targetpos;
+    //                if (transform.position.x > collider.transform.position.x)
+    //                {
+    //                    Debug.Log("1");
+    //                    //collider transform position causomng a problem
+    //                    Vector3 AddedVector = new Vector3(collider.transform.position.x * 0.01f, collider.transform.position.y, collider.transform.position.z);
+    //                    targetpos = AddedVector;
+    //                }
+    //                else
+    //                {
+    //                    Debug.Log("2");
+    //                    Vector3 AddedVector = new Vector3(collider.transform.position.x * 0.01f, collider.transform.position.y, collider.transform.position.z);
+    //                    targetpos = AddedVector;
+    //                }
+
+    //                moveDirection = (targetpos - transform.position).normalized;
+    //                //targetpos = collider.transform.position
+    //                // Move the striker away from the colliding object
+    //                //Debug.Log("the move direction " + moveDirection);
+    //                //Debug.Log("the new move direction " + moveDirection*0.001f);
+    //                //Debug.Log("the present position "+transform.position);
+    //                //Debug.Log("the current transform position  " + transform.position);
+    //                Vector3 newPosition = transform.position + moveDirection * 0.01f;
+    //                Debug.Log("the present pos " + newPosition);
+    //                //                   Debug.Log("the new position " + newPosition);
+    //                //                   Debug.Log("the current collider position "+ collider.transform.position);
+    //                //                   Debug.Log("tghe coin size "+ new Vector3(BoardManager.Instance.CoinSize * 0.00001f, 0, 0)
+    //                //);
+    //                Debug.Log("the current striker pos " + transform.position);
+    //                transform.position = newPosition;
+    //                Debug.Log("t");
+    //                // Check for collisions at the new position
+    //                Collider2D[] newColliders = Physics2D.OverlapCircleAll(newPosition, 0.2f);
+    //                //foreach (Collider2D recollider in newColliders)
+    //                //{
+    //                //    if (collider.gameObject != gameObject)
+    //                //    {
+    //                //        reColliders.Add(collider);
+    //                //    }
+    //                //}
+    //                Debug.Log("befire 1");
+    //                //if (reColliders.Count == 1 && newColliders[0].gameObject == gameObject)
+    //                if (newColliders[0].gameObject == gameObject)
+    //                {
+    //                    Debug.Log("here in count 1");
+    //                    // No collisions at the new position, exit the loop
+    //                    isObstructed = false;
+    //                    break;
+    //                }
+    //            }
+
+    //            if (isObstructed)
+    //            {
+    //                // If still obstructed, generate a new random position
+    //                float randomX = Random.Range(-2.84f, 2.84f);
+    //                //the below loop running again and agaoomn
+    //                transform.position = new Vector3(randomX, -4f, 0f);
+    //            }
+    //        }
+
+    //        yield return null;
+    //    }
+    //    while (isObstructed);
+
+    //    Debug.Log("Sprite renderer enabled");
+    //    GetComponent<SpriteRenderer>().enabled = true;
+    //    GetComponent<CircleCollider2D>().enabled = true;
+    //    GameObject refStriker = GameObject.Find("RefStriker");
+    //    if (refStriker != null)
+    //    {
+    //        Debug.Log("Updating RefStriker position");
+    //        Vector3 refStrikerPosition = refStriker.transform.position;
+    //        refStrikerPosition.x = transform.position.x;
+    //        refStriker.transform.position = refStrikerPosition;
+    //    }
+    //}
 
     private void Update()
     {

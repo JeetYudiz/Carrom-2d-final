@@ -663,6 +663,10 @@ MonoBehaviour:
   ArrowHandle: {fileID: 1805233885}
   ArrowHead: {fileID: 133436879}
   Slider: {fileID: 506733548}
+  isObstructed: 0
+  strikeraroundlayerlength: 1
+  xleftextreme: 0
+  xrightextreme: 0
 --- !u!50 &82672649
 Rigidbody2D:
   serializedVersion: 4
@@ -7905,7 +7909,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   text: {fileID: 1454654859}
   time: 0
-  reftime: 10
+  reftime: 14
 --- !u!114 &1454654859
 MonoBehaviour:
   m_ObjectHideFlags: 0
